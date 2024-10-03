@@ -6,7 +6,7 @@ When writing middleware there is usually quite a lot of preconditions to check. 
 
 This is especially true about mock middleware. Mock middleware is middleware that blocks the actual transmission of a request, and returns a mock response instead. Your browser doesn't actually fetch the requests URL.
 
-The [oauth2 middleware](./middleware/oauth2.md) for example, has unit tests that use the [oauth2 mock middleware](./middleware/oauth2mock.md) to mimick a server. This way you can be sure that the oauth2 client implementation works, without having to setup a real oauth2 server anywhere.
+The [oauth2 middleware](https://github.com/muze-nl/metro-oauth2) for example, has unit tests that use the oauth2 mock-server middleware to mimick a server. This way you can be sure that the oauth2 client implementation works, without having to setup a real oauth2 server anywhere.
 
 Since these mock middleware servers are especially meant for the initial development of new middleware, they should assert as much as they can. And send comprehensive error messages to the console. Here the [`assert.fails()`](./reference/assert/fails.md) method comes in handy.
 

@@ -9,7 +9,7 @@ import jsonmw from '@muze-nl/metro/src/mw/jsonmw'
 const client = metro.client( jsonmw() )
 ```
 
-See the [reference]() for a list of [default middlewares]() available with MetroJS.
+See the [middleware documentation](./middleware/) for a list of default middleware available with MetroJS. In addition, there is a seperate package [@muze-nl/metro-oauth2](https://github.com/muze-nl/metro-oauth2/) that implements an OAuth2 client as metro middleware.
 
 ## Creating middleware
 

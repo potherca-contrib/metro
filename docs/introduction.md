@@ -17,7 +17,7 @@ const client = metro.client({
   }
 }).with(jsonmw())
 
-let response = await client.get('/repos/poef/metrojs/commits')
+let response = await client.get('/repos/muze-nl/metro/commits')
 
 if (response.ok) {
   for ( const commit of response.body ) {

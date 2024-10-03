@@ -28,7 +28,7 @@ If you are using a cdn, and need the assert library or one of the default middle
 </script>
 ```
 
-MetroJS is also available on Github as https://github.com/poef/MetroJS/.
+MetroJS is also available on Github as https://github.com/muze-nl/metro/.
 
 ## Posting form data
 
