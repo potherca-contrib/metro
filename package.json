@@ -1,6 +1,6 @@
 {
   "name": "@muze-nl/metro",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "http client with middleware support",
   "type": "module",
   "source": [ "src/browser.mjs", "src/everything.mjs" ],
@@ -22,14 +22,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/poef/metrojs.git"
+    "url": "git+https://github.com/muze-nl/metro.git"
   },
   "author": "auke@muze.nl",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/poef/metrojs/issues"
+    "url": "https://github.com/muze-nl/metro/issues"
   },
-  "homepage": "https://github.com/poef/metrojs/#readme",
+  "homepage": "https://github.com/muze-nl/metro/#readme",
   "devDependencies": {
     "eslint": "^8.13.0",
     "tap": "^16.0.1"
