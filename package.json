@@ -1,6 +1,6 @@
 {
   "name": "@muze-nl/metro",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "http client with middleware support",
   "type": "module",
   "source": [ "src/browser.mjs", "src/everything.mjs" ],

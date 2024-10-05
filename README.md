@@ -99,6 +99,18 @@ async function myMiddleware(req,next) {
 Both request and response have a `with` function. This allows you to create a new request or response, from 
 the existing one, with one or more options added or changed. The original request or response is not changed.
 
+## Existing middleware
+
+With @muze-nl/metro, you get these middleware modules:
+- [json](./docs/middleware/json.md)
+- [thrower](./docs/middleware/thrower.md)
+- [echo mock](./docs/middleware/echomock.md)
+- [error mock](./docs/middleware/errormock.md)
+
+In addition work is ongoing on these separate middleware libraries:
+- [@muze-nl/metro-oauth2](https://github.com/muze-nl/metro-oauth2/)
+- [@muze-nl/metro-oidc](https://github.com/muze-nl/metro-oidc/)
+
 ## Debugging
 
 Middleware is powerful, but can also be difficult to debug. For this reason MetroJS adds a trace feature. This 
@@ -141,56 +153,6 @@ export default function myMiddleware(options)
 ```
 
 See for example the [jsonmw](src/mw/json.mjs) middleware.
-
-## metro.assert
-
-For more complex middleware code, it can be very helpful to check any number of preconditions and give 
-helpful error messages to developers. However, in production such code only slows down the experience, and the
-error messages don't mean anything to normal users. For this use MetroJS includes a simple assert module. This
-allows you to add assertions, which only get checked if it is enabled. Something that a developer can decide to
-do while developing code using your middleware.
-
-To use this in your middleware code, do this:
-
-```javascript
-import * as metro from '@muze-nl/metro'
-import * as assert from '@muze-nl/metro/src/assert.mjs'
-
-export default function myMiddleware(options) {
-
-  assert.check(options, {
-    'foo':'bar',
-    'bar':assert.optional(assert.oneOf('bar','baz')),
-    'baz':/b.+/
-  })
-
-  return async (req,next) => {
-
-    assert.check(req.headers, {
-      'X-Foo':'bar'
-    }
-
-    return await next(req)
-  }
-}
-```
-
-A developer may now enable assertion checking by calling `assert.enable()`:
-
-```
-import * as metro from '@muze-nl/metro'
-import * as assert from '@muze-nl/metro/src/assert'
-
-async function main() {
-  const client = metro.client(myMiddleware(options))
-  assert.enable()
-  let result = await client.get('foo/')
-}
-```
-
-If any assertion fails, it will throw an Error with a list of assertions that failed.
-
-
 
 [project-stage-badge: Experimental]: https://img.shields.io/badge/Project%20Stage-Experimental-yellow.svg
 [project-stage-page]: https://blog.pother.ca/project-stages/
