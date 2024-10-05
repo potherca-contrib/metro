@@ -47,6 +47,12 @@ tap.test('search4', t => {
 	t.end()
 })
 
+tap.test('search5', t => {
+	let url = metro.url('https://example.com?foo=bar', 'bar/')
+	t.equal(url.href, 'https://example.com/bar/')
+	t.end()
+})
+
 tap.test('searchFunction', t => {
 	let url = metro.url('https://example.com?foo=bar', { 
 		search: (search, url) => {
