@@ -315,6 +315,9 @@ export function request(...options) {
 				break
 				case 'with':
 					return function(...options) {
+						if (body) { // body is kept in a seperate value, if it set earlier
+							options.unshift({ body }) // unshifted so it can be overridden by options
+						}
 						return request(target, ...options)
 					}
 				break
