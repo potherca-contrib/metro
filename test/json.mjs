@@ -15,3 +15,14 @@ tap.test('start', async t => {
 	t.equal(res.body.foo, 'bar')
 	t.end()
 })
+
+tap.test('start', async t => {
+	let c = metro.client().with(echomw()).with(jsonmw())
+	let res = await c.post('foo/', {
+		body: {
+			foo: 'bar'
+		}
+	})
+	t.equal(res.body.foo, 'bar')
+	t.end()
+})
