@@ -1,11 +1,31 @@
+/**
+ * base URL used to link to more information about an error message
+ */
 const metroURL = 'https://metro.muze.nl/details/'
 
+/**
+ * Symbols:
+ * - isProxy: used to test if an object is a metro Proxy to another object
+ * - source: used to return the actual source (target) of a metro Proxy
+ */
 export const symbols = {
 	isProxy: Symbol('isProxy'),
 	source: Symbol('source')
 }
 
-class Client {
+/**
+ * Metro HTTP Client with middleware support
+ * @method get
+ * @method post
+ * @method put
+ * @method delete
+ * @method patch
+ * @method head
+ * @method options
+ * @method query
+ */
+class Client
+{
 	#options = {
 		url: typeof window != 'undefined' ? window.location : 'https://localhost'
 	}
@@ -13,7 +33,18 @@ class Client {
 
 	static tracers = {}
 
-	constructor(...options) {
+	/**
+	 * @typedef {Object} ClientOptions
+	 * @property {Array} middlewares - list of middleware functions
+	 * @property {string|URL} url - default url of the client
+	 * @property {[string]} verbs - a list of verb methods to expose, e.g. ['get','post']
+	 * 
+	 * Constructs a new metro client. Can have any number of params.
+	 * @params {ClientOptions|URL|Function|Client}
+	 * @returns {Client} - A metro client object with given or default verb methods
+	 */
+	constructor(...options)
+	{
 		for (let option of options) {
 			if (typeof option == 'string' || option instanceof String) {
 				this.#options.url = ''+option
@@ -40,7 +71,7 @@ class Client {
 
 		for (const verb of this.#verbs) {
 			this[verb] = async function(...options) {
-				return this.#fetch(request(
+				return this.fetch(request(
 					this.#options,
 					...options,
 					{method: verb.toUpperCase()}
@@ -50,7 +81,8 @@ class Client {
 		Object.freeze(this)
 	}
 
-	#addMiddlewares(middlewares) {
+	#addMiddlewares(middlewares)
+	{
 		if (typeof middlewares == 'function') {
 			middlewares = [ middlewares ]
 		}
@@ -65,21 +97,43 @@ class Client {
 		this.#options.middlewares = this.#options.middlewares.concat(middlewares)
 	}
 
-	#fetch(req) {
+	/**
+	 * Mimics the standard browser fetch method, but uses any middleware installed through
+	 * the constructor.
+	 * @param {Request|string|Object} - Required. The URL or Request object, accepts all types that are accepted by metro.request
+	 * @param {Object} - Optional. Any object that is accepted by metro.request
+	 * @return {Promise<Response|*>} - The metro.response to this request, or any other result as changed by any included middleware.
+	 */
+	fetch(req, options)
+	{
+		req = request(req, options)
 		if (!req.url) {
-			throw metroError('metro.client.'+r.method.toLowerCase()+': Missing url parameter '+metroURL+'client/missing-url-param/', req)
+			throw metroError('metro.client.'+req.method.toLowerCase()+': Missing url parameter '+metroURL+'client/missing-url-param/', req)
 		}
-		let metrofetch = async (req) => {
+		if (!options) {
+			options = {}
+		}
+		if (!(typeof options === 'object') 
+			|| Array.isArray(options)
+			|| options instanceof String) 
+		{
+			throw metroError('metro.client.fetch: Options is not an object')
+		}
+
+		const metrofetch = async function browserFetch(req)
+		{
 			if (req[symbols.isProxy]) {
 				// even though a Proxy is supposed to be 'invisible'
 				// fetch() doesn't work with the proxy (in Firefox), 
 				// you need the actual Request object here
 				req = req[symbols.source]
 			}
-			return response(await fetch(req))
+			const res = await fetch(req)
+			return response(res)
 		}
+		
 		let middlewares = [metrofetch].concat(this.#options?.middlewares?.slice() || [])
-		let options = this.#options
+		options = Object.assign({}, this.#options, options)
 		//@TODO: do this once in constructor?
 		let next
 		for (let middleware of middlewares) {
@@ -89,13 +143,13 @@ class Client {
 					let tracers = Object.values(Client.tracers)
 					for(let tracer of tracers) {
 						if (tracer.request) {
-							tracer.request.call(tracer, req)
+							tracer.request.call(tracer, req, middleware)
 						}
 					}
 					res = await middleware(req, next)
 					for(let tracer of tracers) {
 						if (tracer.response) {
-							tracer.response.call(tracer, res)
+							tracer.response.call(tracer, res, middleware)
 						}
 					}
 					return res
@@ -110,11 +164,18 @@ class Client {
 	}
 }
 
-export function client(...options) {
+/**
+ * Returns a new metro Client object.
+ * @param {...ClientOptions|string|URL}
+ * @return Client
+ */
+export function client(...options)
+{
 	return new Client(...options)
 }
 
-function appendHeaders(r, headers) {
+function appendHeaders(r, headers)
+{
 	if (!Array.isArray(headers)) {
 		headers = [headers]
 	}
@@ -136,7 +197,8 @@ function appendHeaders(r, headers) {
 	})
 }
 
-function bodyProxy(body, r) {
+function bodyProxy(body, r)
+{
 	let source = r.body
 	if (!source) {
 		//Firefox does not allow access to Request.body (undefined)
@@ -231,7 +293,8 @@ function bodyProxy(body, r) {
 	})
 }
 
-function getRequestParams(req, current) {
+function getRequestParams(req, current)
+{
 	let params = current || {}
 	if (!params.url && current.url) {
 		params.url = current.url
@@ -261,7 +324,21 @@ function getRequestParams(req, current) {
 	return params
 }
 
-export function request(...options) {
+/**
+ * @typedef {Request} MetroRequest
+ * @property {Symbol(source)} - returns the target Request of this Proxy
+ * @property {Symbol(isProxy)} - returns true
+ * @method with - returns a new MetroRequest, with the given options added
+ * @param {<RequestOptions|Request|string|URL|URLSearchParams|FormData|ReadableStream|
+ *   Blob|ArrayBuffer|DataView|TypedArray>} ...options - request options, handled in order
+ * 
+ * Returns a new metro Request object
+ * @param {<RequestOptions|Request|string|URL|URLSearchParams|FormData|ReadableStream|
+ *   Blob|ArrayBuffer|DataView|TypedArray>} ...options - request options, handled in order
+ * @return {MetroRequest} - a new metro Request object
+ */
+export function request(...options)
+{
 	// the standard Request constructor is a minefield
 	// so first gather all the options together into a single
 	// javascript object, then set it in one go
@@ -358,7 +435,8 @@ export function request(...options) {
 	})
 }
 
-function getResponseParams(res, current) {
+function getResponseParams(res, current)
+{
 	// function to fetch all relevant properties of a Response
 	let params = current || {}
 	if (!params.url && current.url) {
@@ -378,7 +456,21 @@ function getResponseParams(res, current) {
 	return params
 }
 
-export function response(...options) {
+/**
+ * @typedef {Response} MetroResponse
+ * @property {Symbol(source)} - returns the target Response of this Proxy
+ * @property {Symbol(isProxy)} - returns true
+ * @method with - returns a new MetroResponse, with the given options added
+ * @param {<ResponseOptions|Response|string|URLSearchParams|FormData|ReadableStream|
+ *   Blob|ArrayBuffer|DataView|TypedArray>} ...options - respomse options, handled in order
+ * 
+ * Returns a new metro Response object
+ * @param {<ResponseOptions|Response|string|URLSearchParams|FormData|ReadableStream|
+ *   Blob|ArrayBuffer|DataView|TypedArray>} ...options - request options, handled in order
+ * @return {MetroResponse} - a new metro Response object
+ */
+export function response(...options)
+{
 	let responseParams = {}
 	for (let option of options) {
 		if (typeof option == 'string') {
@@ -465,7 +557,19 @@ function appendSearchParams(url, params) {
 	}
 }
 
-export function url(...options) {
+/**
+ * @typedef {URL} MetroURL
+ * @property {Symbol(source)} - returns the target Request of this Proxy
+ * @property {Symbol(isProxy)} - returns true
+ * @method with - returns a new MetroRequest, with the given options added
+ * @param {<URL|URLSearchParams|string|Object|Function>} ...options - url options, handled in order
+ * 
+ * Returns a new metro URL object
+ * @param {<URL|URLSearchParams|string|Object|Function>} ...options - url options, handled in order
+ * @return {MetroURL} - a new metro URL object
+ */
+export function url(...options)
+{
 	let validParams = ['hash','host','hostname','href',
 			'password','pathname','port','protocol','username','search','searchParams']
 	let u = new URL('https://localhost/')
@@ -540,7 +644,19 @@ export function url(...options) {
 	})
 }
 
-export function formdata(...options) {
+/**
+ * @typedef {FormData} MetroFormData
+ * @property {Symbol(source)} - returns the target Request of this Proxy
+ * @property {Symbol(isProxy)} - returns true
+ * @method with - returns a new MetroRequest, with the given options added
+ * @param {<FormData|Object>} ...options - url options, handled in order
+ * 
+ * Returns a new metro FormData object
+ * @param {<FormData|Object>} ...options - formdata options, handled in order
+ * @return {MetroURL} - a new metro FormData object
+ */
+export function formdata(...options)
+{
 	var params = new FormData()
 	for (let option of options) {
 		if (option instanceof FormData) {
@@ -603,32 +719,56 @@ const metroConsole = {
 	}
 }
 
+
+/**
+ * Custom Metro Error function that outputs to the console then throws an error
+ */
 export function metroError(message, ...details) {
 	metroConsole.error(message, ...details)
 	return new Error(message, ...details)
 }
 
-
+/**
+ * Set of debugging tools to trace the request - response flow
+ * Tracer are run on all metro fetch calls
+ */
 export const trace = {
+	/**
+	 * Adds a named tracer function
+	 * @param {string} name - the name of the tracer
+	 * @param {Function} tracer - the tracer function to call
+	 */
 	add(name, tracer) {
 		Client.tracers[name] = tracer
 	},
+	/**
+	 * Removes a named tracer function
+	 * @param {string} name
+	 */
 	delete(name) {
 		delete Client.tracers[name]
 	},
+	/**
+	 * Removes all tracer functions
+	 */
 	clear() {
 		Client.tracers = {}
 	},
+	/**
+	 * Returns a set of request and response tracer functions that use the
+	 * console.group feature to shows nested request/response pairs, with
+	 * most commonly needed information for debugging
+	 */
 	group() {
 		let group = 0;
 		return {
-			request: (req) => {
+			request: (req, middleware) => {
 				group++
 				metroConsole.group(group)
-				metroConsole.info(req?.url, req)
+				metroConsole.info(req?.url, req, middleware)
 			},
-			response: (res) => {
-				metroConsole.info(res?.body ? res.body[symbols.source]: null, res)
+			response: (res, middleware) => {
+				metroConsole.info(res?.body ? res.body[symbols.source]: null, res, middleware)
 				metroConsole.groupEnd(group)
 				group--
 			}

@@ -65,3 +65,12 @@ tap.test('govert', async t => {
 	t.equal(body, 'foo')
 	t.end()
 })
+
+tap.test('fetch', async t => {
+	let url = 'http://localhost:3000/query/'
+	let client = metro.client(url).with(echomw())
+	let response = await client.fetch({method: 'POST', body:'foo'})
+	let body = await response.text()
+	t.equal(body, 'foo')
+	t.end()	
+})
