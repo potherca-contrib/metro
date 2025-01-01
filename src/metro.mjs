@@ -692,12 +692,12 @@ export function formdata(...options)
 						return formdata(target, ...options)
 					}
 				break
-				case 'toString':
-				case 'toJSON':
-					return function() {
-						return target[prop]()
-					}
-				break
+				// case 'toString':
+				// case 'toJSON':
+				// 	return function() {
+				// 		return target[prop]()
+				// 	}
+				// break
 			}
 			return target[prop]
 		}
