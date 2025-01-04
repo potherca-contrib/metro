@@ -128,7 +128,13 @@ class Client
 				// even though a Proxy is supposed to be 'invisible'
 				// fetch() doesn't work with the proxy (in Firefox), 
 				// you need the actual Request object here
-				req = req[Symbol.metroSource]
+				// and the actual body if you use e.g. FormData
+				if (req.body && req.body[Symbol.metroSource]) {
+					let body = req.body[Symbol.metroSource]
+					req = new Request(req[Symbol.metroSource], { body })
+				} else {
+					req = req[Symbol.metroSource]
+				}
 			}
 			const res = await fetch(req)
 			return response(res)
