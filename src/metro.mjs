@@ -8,9 +8,11 @@ const metroURL = 'https://metro.muze.nl/details/'
  * - isProxy: used to test if an object is a metro Proxy to another object
  * - source: used to return the actual source (target) of a metro Proxy
  */
-export const symbols = {
-	isProxy: Symbol('isProxy'),
-	source: Symbol('source')
+if (!Symbol.metroProxy) {
+	Symbol.metroProxy = Symbol('isProxy')
+}
+if (!Symbol.metroSource) {
+	Symbol.metroSource = Symbol('source')
 }
 
 /**
@@ -122,11 +124,11 @@ class Client
 
 		const metrofetch = async function browserFetch(req)
 		{
-			if (req[symbols.isProxy]) {
+			if (req[Symbol.metroProxy]) {
 				// even though a Proxy is supposed to be 'invisible'
 				// fetch() doesn't work with the proxy (in Firefox), 
 				// you need the actual Request object here
-				req = req[symbols.source]
+				req = req[Symbol.metroSource]
 			}
 			const res = await fetch(req)
 			return response(res)
@@ -248,10 +250,10 @@ function bodyProxy(body, r)
 	return new Proxy(source, {
 		get(target, prop, receiver) {
 			switch (prop) {
-				case symbols.isProxy:
+				case Symbol.metroProxy:
 					return true
 				break
-				case symbols.source:
+				case Symbol.metroSource:
 					return body
 				break
 				case 'toString':
@@ -260,7 +262,7 @@ function bodyProxy(body, r)
 					}
 				break
 			}
-			if (typeof body == 'object') {
+			if (body && typeof body == 'object') {
 				if (prop in body) {
 					if (typeof body[prop] == 'function') {
 						return function(...args) {
@@ -282,13 +284,25 @@ function bodyProxy(body, r)
 			}
 		},
 		has(target, prop) {
-			return prop in body
+			if (body && typeof body == 'object') {
+				return prop in body
+			} else {
+				return prop in target
+			}
 		},
 		ownKeys(target) {
-			return Reflect.ownKeys(body)
+			if (body && typeof body == 'object') {
+				return Reflect.ownKeys(body)
+			} else {
+				return Reflect.ownKeys(target)
+			}
 		},
 		getOwnPropertyDescriptor(target, prop) {
-			return Object.getOwnPropertyDescriptor(body,prop)
+			if (body && typeof body == 'object') {
+				return Object.getOwnPropertyDescriptor(body,prop)
+			} else {
+				return Object.getOwnPropertyDescriptor(target,prop)
+			}
 		}
 	})
 }
@@ -384,10 +398,10 @@ export function request(...options)
 	return new Proxy(r, {
 		get(target, prop, receiver) {
 			switch(prop) {
-				case symbols.source:
+				case Symbol.metroSsource:
 					return target
 				break
-				case symbols.isProxy:
+				case Symbol.metroProxy:
 					return true
 				break
 				case 'with':
@@ -423,12 +437,15 @@ export function request(...options)
 						body = target.body
 					}
 					if (body) {
-						if (body[symbols.isProxy]) {
+						if (body[Symbol.metroProxy]) {
 							return body
 						}
 						return bodyProxy(body, target)
 					}
 				break
+			}
+			if (target[prop] instanceof Function) {
+				return target[prop].bind(target)
 			}
 			return target[prop]
 		}
@@ -498,10 +515,10 @@ export function response(...options)
 	return new Proxy(r, {
 		get(target, prop, receiver) {
 			switch(prop) {
-				case symbols.isProxy:
+				case Symbol.metroProxy:
 					return true
 				break
-				case symbols.source:
+				case Symbol.metroSource:
 					return target
 				break
 				case 'with':
@@ -511,7 +528,7 @@ export function response(...options)
 				break
 				case 'body':
 					if (responseParams.body) {
-						if (responseParams.body[symbols.isProxy]) {
+						if (responseParams.body[Symbol.metroProxy]) {
 							return responseParams.body
 						}
 						return bodyProxy(responseParams.body, target)
@@ -621,10 +638,10 @@ export function url(...options)
 	return new Proxy(u, {
 		get(target, prop, receiver) {
 			switch(prop) {
-				case symbols.isProxy:
+				case Symbol.metroProxy:
 					return true
 				break
-				case symbols.source:
+				case Symbol.metroSource:
 					return target
 				break
 				case 'with':
@@ -681,10 +698,10 @@ export function formdata(...options)
 	return new Proxy(params, {
 		get: (target,prop,receiver) => {
 			switch(prop) {
-				case symbols.isProxy:
+				case Symbol.metroProxy:
 					return true
 				break
-				case symbols.source:
+				case Symbol.metroSource:
 					return target
 				break
 				case 'with':
@@ -768,7 +785,7 @@ export const trace = {
 				metroConsole.info(req?.url, req, middleware)
 			},
 			response: (res, middleware) => {
-				metroConsole.info(res?.body ? res.body[symbols.source]: null, res, middleware)
+				metroConsole.info(res?.body ? res.body[Symbol.metroSource]: null, res, middleware)
 				metroConsole.groupEnd(group)
 				group--
 			}

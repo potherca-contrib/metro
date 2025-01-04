@@ -1,2 +1,699 @@
-function e(e,t,r,o){Object.defineProperty(e,t,{get:r,set:o,enumerable:!0,configurable:!0})}var t=globalThis,r={},o={},n=t.parcelRequire94c2;null==n&&((n=function(e){if(e in r)return r[e].exports;if(e in o){var t=o[e];delete o[e];var n={id:e,exports:{}};return r[e]=n,t.call(n.exports,n,n.exports),n.exports}var s=Error("Cannot find module '"+e+"'");throw s.code="MODULE_NOT_FOUND",s}).register=function(e,t){o[e]=t},t.parcelRequire94c2=n),(0,n.register)("hkeot",function(t,r){e(t.exports,"symbols",()=>n),e(t.exports,"request",()=>c),e(t.exports,"metroError",()=>w),e(t.exports,"response",()=>u),e(t.exports,"client",()=>a),e(t.exports,"url",()=>p),e(t.exports,"formdata",()=>function e(...t){var r=new FormData;for(let e of t)if(e instanceof FormData)for(let t of e.entries())r.append(t[0],t[1]);else if(e&&"object"==typeof e)for(let t of Object.entries(e))if(Array.isArray(t[1]))for(let e of t[1])r.append(t[0],e);else r.append(t[0],t[1]);else throw new w("metro.formdata: unknown option type, only FormData or Object supported",e);return Object.freeze(r),new Proxy(r,{get:(t,r,o)=>{switch(r){case n.isProxy:return!0;case n.source:return t;case"with":return function(...r){return e(t,...r)}}return t[r]}})}),e(t.exports,"trace",()=>m);let o="https://metro.muze.nl/details/",n={isProxy:Symbol("isProxy"),source:Symbol("source")};class s{#e={url:"undefined"!=typeof window?window.location:"https://localhost"};#t=["get","post","put","delete","patch","head","options","query"];static tracers={};constructor(...e){for(let t of e)if("string"==typeof t||t instanceof String)this.#e.url=""+t;else if(t instanceof s)Object.assign(this.#e,t.#e);else if(t instanceof Function)this.#r([t]);else if(t&&"object"==typeof t)for(let e in t)"middlewares"==e?this.#r(t[e]):"function"==typeof t[e]?this.#e[e]=t[e](this.#e[e],this.#e):this.#e[e]=t[e];for(let e of(this.#e.verbs&&(this.#t=this.#e.verbs,delete this.#e.verbs),this.#t))this[e]=async function(...t){return this.fetch(c(this.#e,...t,{method:e.toUpperCase()}))};Object.freeze(this)}#r(e){"function"==typeof e&&(e=[e]);let t=e.findIndex(e=>"function"!=typeof e);if(t>=0)throw w("metro.client: middlewares must be a function or an array of functions "+o+"client/invalid-middlewares-value/",e[t]);Array.isArray(this.#e.middlewares)||(this.#e.middlewares=[]),this.#e.middlewares=this.#e.middlewares.concat(e)}fetch(e,t){let r;if(!(e=c(e,t)).url)throw w("metro.client."+e.method.toLowerCase()+": Missing url parameter "+o+"client/missing-url-param/",e);if(t||(t={}),"object"!=typeof t||Array.isArray(t)||t instanceof String)throw w("metro.client.fetch: Options is not an object");let a=[async function(e){return e[n.isProxy]&&(e=e[n.source]),u(await fetch(e))}].concat(this.#e?.middlewares?.slice()||[]);for(let e of(t=Object.assign({},this.#e,t),a))r=function(e,t){return async function(r){let o;let n=Object.values(s.tracers);for(let e of n)e.request&&e.request.call(e,r,t);for(let s of(o=await t(r,e),n))s.response&&s.response.call(s,o,t);return o}}(r,e);return r(e)}with(...e){return new s(this,...e)}}function a(...e){return new s(...e)}function i(e,t){let r=t.body;return r||(null===e?r=new ReadableStream:e instanceof ReadableStream?r=e:e instanceof Blob?r=e.stream():r=new ReadableStream({start(t){let r;switch(typeof e){case"object":if("function"==typeof e.toString)r=e.toString();else if(e instanceof FormData)r=new URLSearchParams(e).toString();else if(e instanceof ArrayBuffer||ArrayBuffer.isView(e))r=e;else throw w("Cannot convert body to ReadableStream",e);break;case"string":case"number":case"boolean":r=e;break;default:throw w("Cannot convert body to ReadableStream",e)}t.enqueue(r),t.close()}})),new Proxy(r,{get(t,r,o){switch(r){case n.isProxy:return!0;case n.source:return e;case"toString":return function(){return""+e}}return"object"==typeof e&&r in e?"function"==typeof e[r]?function(...t){return e[r].apply(e,t)}:e[r]:r in t&&"toString"!=r?"function"==typeof t[r]?function(...e){return t[r].apply(t,e)}:t[r]:void 0},has:(t,r)=>r in e,ownKeys:t=>Reflect.ownKeys(e),getOwnPropertyDescriptor:(t,r)=>Object.getOwnPropertyDescriptor(e,r)})}function c(...e){let t={url:"undefined"!=typeof window?window.location:"https://localhost/",duplex:"half"};for(let r of e)"string"==typeof r||r instanceof URL||r instanceof URLSearchParams?t.url=p(t.url,r):r&&(r instanceof FormData||r instanceof ReadableStream||r instanceof Blob||r instanceof ArrayBuffer||r instanceof DataView)?t.body=r:r&&"object"==typeof r&&Object.assign(t,function(e,t){let r=t||{};for(let o of(!r.url&&t.url&&(r.url=t.url),["method","headers","body","mode","credentials","cache","redirect","referrer","referrerPolicy","integrity","keepalive","signal","priority","url"]))if("function"==typeof e[o])e[o](r[o],r);else if(void 0!==e[o]){if("url"==o)r.url=p(r.url,e.url);else if("headers"==o)for(let[o,n]of(r.headers=new Headers(t.headers),e.headers instanceof Headers||(e.headers=new Headers(e.headers)),e.headers.entries()))r.headers.set(o,n);else r[o]=e[o]}return r}(r,t));let r=t.body;!r||"object"!=typeof r||r instanceof String||r instanceof ReadableStream||r instanceof Blob||r instanceof ArrayBuffer||r instanceof DataView||r instanceof FormData||r instanceof URLSearchParams||"undefined"!=typeof TypedArray&&r instanceof TypedArray||(t.body=JSON.stringify(r));let o=new Request(t.url,t);return Object.freeze(o),new Proxy(o,{get(e,t,o){switch(t){case n.source:return e;case n.isProxy:return!0;case"with":return function(...t){return r&&t.unshift({body:r}),c(e,...t)};case"toString":case"toJSON":return function(){return e[t].apply(e)};case"blob":case"text":case"json":return function(){return e[t].apply(e)};case"body":if(r||(r=e.body),r){if(r[n.isProxy])return r;return i(r,e)}}return e[t]}})}function f(e,t){let r=t||{};for(let o of(!r.url&&t.url&&(r.url=t.url),["status","statusText","headers","body","url","type","redirected"]))"function"==typeof e[o]?e[o](r[o],r):void 0!==e[o]&&("url"==o?r.url=new URL(e.url,r.url||"https://localhost/"):r[o]=e[o]);return r}function u(...e){let t={};for(let r of e)"string"==typeof r?t.body=r:r instanceof Response?Object.assign(t,f(r,t)):r&&"object"==typeof r&&(r instanceof FormData||r instanceof Blob||r instanceof ArrayBuffer||r instanceof DataView||r instanceof ReadableStream||r instanceof URLSearchParams||r instanceof String||"undefined"!=typeof TypedArray&&r instanceof TypedArray?t.body=r:Object.assign(t,f(r,t)));let r=new Response(t.body,t);return Object.freeze(r),new Proxy(r,{get(e,r,o){switch(r){case n.isProxy:return!0;case n.source:return e;case"with":return function(...t){return u(e,...t)};case"body":if(!t.body)return i("",e);if(t.body[n.isProxy])return t.body;return i(t.body,e);case"ok":return e.status>=200&&e.status<400;case"headers":return e.headers;default:if(r in t&&"toString"!=r)return t[r];if(r in e&&"toString"!=r){if("function"==typeof e[r])return function(...t){return e[r].apply(e,t)};return e[r]}}}})}function l(e,t){"function"==typeof t?t(e.searchParams,e):(t=new URLSearchParams(t)).forEach((t,r)=>{e.searchParams.append(r,t)})}function p(...e){let t=["hash","host","hostname","href","password","pathname","port","protocol","username","search","searchParams"],r=new URL("https://localhost/");for(let n of e)if("string"==typeof n||n instanceof String)r=new URL(n,r);else if(n instanceof URL||"undefined"!=typeof Location&&n instanceof Location)r=new URL(n);else if(n instanceof URLSearchParams)l(r,n);else if(n&&"object"==typeof n)for(let s in n)if("search"==s)"function"==typeof n.search?n.search(r.search,r):r.search=new URLSearchParams(n.search);else if("searchParams"==s)l(r,n.searchParams);else{if(!t.includes(s))throw w("metro.url: unknown url parameter "+o+"url/unknown-param-name/",s);if("function"==typeof n[s])n[s](r[s],r);else if("string"==typeof n[s]||n[s]instanceof String||"number"==typeof n[s]||n[s]instanceof Number||"boolean"==typeof n[s]||n[s]instanceof Boolean)r[s]=""+n[s];else if("object"==typeof n[s]&&n[s].toString)r[s]=n[s].toString();else throw w("metro.url: unsupported value for "+s+" "+o+"url/unsupported-param-value/",e[s])}else throw w("metro.url: unsupported option value "+o+"url/unsupported-option-value/",n);return Object.freeze(r),new Proxy(r,{get(e,t,r){switch(t){case n.isProxy:return!0;case n.source:return e;case"with":return function(...t){return p(e,...t)};case"toString":case"toJSON":return function(){return e[t]()}}return e[t]}})}let d=(e,...t)=>{console.error("Ⓜ️  ",e,...t)},y=(e,...t)=>{console.info("Ⓜ️  ",e,...t)},h=e=>{console.group("Ⓜ️  "+e)},b=e=>{console.groupEnd("Ⓜ️  "+e)};function w(e,...t){return d(e,...t),Error(e,...t)}let m={add(e,t){s.tracers[e]=t},delete(e){delete s.tracers[e]},clear(){s.tracers={}},group(){let e=0;return{request:(t,r)=>{h(++e),y(t?.url,t,r)},response:(t,r)=>{y(t?.body?t.body[n.source]:null,t,r),b(e),e--}}}}});var s=(n("hkeot"),n("hkeot"));n("hkeot"),window.metro=Object.assign({},s,{mw:{jsonmw:function(e){return e=Object.assign({reviver:null,replacer:null,space:""},e),async(t,r)=>{["POST","PUT","PATCH","QUERY"].includes(t.method)?(t=t.with({headers:{"Content-Type":"application/json",Accept:"application/json"}})).body&&"object"==typeof t.body[s.symbols.source]&&(t=t.with({body:JSON.stringify(t.body[s.symbols.source],e.replacer,e.space)})):t=t.with({headers:{Accept:"application/json"}});let o=await r(t),n=JSON.parse(await o.text(),e.reviver);return o.with({body:n})}},thrower:function(e){return async(t,r)=>{let o=await r(t);if(!o.ok){if(e&&"function"==typeof e[o.status])o=e[o.status].apply(o,t);else throw Error(o.status+": "+o.statusText,{cause:o})}return o}}}});
+(() => {
+  var __defProp = Object.defineProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+
+  // src/metro.mjs
+  var metro_exports = {};
+  __export(metro_exports, {
+    client: () => client,
+    formdata: () => formdata,
+    metroError: () => metroError,
+    request: () => request,
+    response: () => response,
+    trace: () => trace,
+    url: () => url
+  });
+  var metroURL = "https://metro.muze.nl/details/";
+  if (!Symbol.metroProxy) {
+    Symbol.metroProxy = Symbol("isProxy");
+  }
+  if (!Symbol.metroSource) {
+    Symbol.metroSource = Symbol("source");
+  }
+  var Client = class _Client {
+    #options = {
+      url: typeof window != "undefined" ? window.location : "https://localhost"
+    };
+    #verbs = ["get", "post", "put", "delete", "patch", "head", "options", "query"];
+    static tracers = {};
+    /**
+     * @typedef {Object} ClientOptions
+     * @property {Array} middlewares - list of middleware functions
+     * @property {string|URL} url - default url of the client
+     * @property {[string]} verbs - a list of verb methods to expose, e.g. ['get','post']
+     * 
+     * Constructs a new metro client. Can have any number of params.
+     * @params {ClientOptions|URL|Function|Client}
+     * @returns {Client} - A metro client object with given or default verb methods
+     */
+    constructor(...options) {
+      for (let option of options) {
+        if (typeof option == "string" || option instanceof String) {
+          this.#options.url = "" + option;
+        } else if (option instanceof _Client) {
+          Object.assign(this.#options, option.#options);
+        } else if (option instanceof Function) {
+          this.#addMiddlewares([option]);
+        } else if (option && typeof option == "object") {
+          for (let param in option) {
+            if (param == "middlewares") {
+              this.#addMiddlewares(option[param]);
+            } else if (typeof option[param] == "function") {
+              this.#options[param] = option[param](this.#options[param], this.#options);
+            } else {
+              this.#options[param] = option[param];
+            }
+          }
+        }
+      }
+      if (this.#options.verbs) {
+        this.#verbs = this.#options.verbs;
+        delete this.#options.verbs;
+      }
+      for (const verb of this.#verbs) {
+        this[verb] = async function(...options2) {
+          return this.fetch(request(
+            this.#options,
+            ...options2,
+            { method: verb.toUpperCase() }
+          ));
+        };
+      }
+      Object.freeze(this);
+    }
+    #addMiddlewares(middlewares) {
+      if (typeof middlewares == "function") {
+        middlewares = [middlewares];
+      }
+      let index = middlewares.findIndex((m) => typeof m != "function");
+      if (index >= 0) {
+        throw metroError("metro.client: middlewares must be a function or an array of functions " + metroURL + "client/invalid-middlewares-value/", middlewares[index]);
+      }
+      if (!Array.isArray(this.#options.middlewares)) {
+        this.#options.middlewares = [];
+      }
+      this.#options.middlewares = this.#options.middlewares.concat(middlewares);
+    }
+    /**
+     * Mimics the standard browser fetch method, but uses any middleware installed through
+     * the constructor.
+     * @param {Request|string|Object} - Required. The URL or Request object, accepts all types that are accepted by metro.request
+     * @param {Object} - Optional. Any object that is accepted by metro.request
+     * @return {Promise<Response|*>} - The metro.response to this request, or any other result as changed by any included middleware.
+     */
+    fetch(req, options) {
+      req = request(req, options);
+      if (!req.url) {
+        throw metroError("metro.client." + req.method.toLowerCase() + ": Missing url parameter " + metroURL + "client/missing-url-param/", req);
+      }
+      if (!options) {
+        options = {};
+      }
+      if (!(typeof options === "object") || Array.isArray(options) || options instanceof String) {
+        throw metroError("metro.client.fetch: Options is not an object");
+      }
+      const metrofetch = async function browserFetch(req2) {
+        if (req2[Symbol.metroProxy]) {
+          if (req2.body) {
+            try {
+              let r = req2.with();
+              let f = await r.formData();
+              console.log("hier", f);
+            } catch (e) {
+            }
+          }
+          req2 = req2[Symbol.metroSource];
+        }
+        const res = await fetch(req2);
+        return response(res);
+      };
+      let middlewares = [metrofetch].concat(this.#options?.middlewares?.slice() || []);
+      options = Object.assign({}, this.#options, options);
+      let next;
+      for (let middleware of middlewares) {
+        next = /* @__PURE__ */ function(next2, middleware2) {
+          return async function(req2) {
+            let res;
+            let tracers = Object.values(_Client.tracers);
+            for (let tracer of tracers) {
+              if (tracer.request) {
+                tracer.request.call(tracer, req2, middleware2);
+              }
+            }
+            res = await middleware2(req2, next2);
+            for (let tracer of tracers) {
+              if (tracer.response) {
+                tracer.response.call(tracer, res, middleware2);
+              }
+            }
+            return res;
+          };
+        }(next, middleware);
+      }
+      return next(req);
+    }
+    with(...options) {
+      return new _Client(this, ...options);
+    }
+  };
+  function client(...options) {
+    return new Client(...options);
+  }
+  function bodyProxy(body, r) {
+    let source = r.body;
+    if (!source) {
+      if (body === null) {
+        source = new ReadableStream();
+      } else if (body instanceof ReadableStream) {
+        source = body;
+      } else if (body instanceof Blob) {
+        source = body.stream();
+      } else {
+        source = new ReadableStream({
+          start(controller) {
+            let chunk;
+            switch (typeof body) {
+              case "object":
+                if (typeof body.toString == "function") {
+                  chunk = body.toString();
+                } else if (body instanceof FormData) {
+                  chunk = new URLSearchParams(body).toString();
+                } else if (body instanceof ArrayBuffer || ArrayBuffer.isView(body)) {
+                  chunk = body;
+                } else {
+                  throw metroError("Cannot convert body to ReadableStream", body);
+                }
+                break;
+              case "string":
+              case "number":
+              case "boolean":
+                chunk = body;
+                break;
+              default:
+                throw metroError("Cannot convert body to ReadableStream", body);
+                break;
+            }
+            controller.enqueue(chunk);
+            controller.close();
+          }
+        });
+      }
+    }
+    return new Proxy(source, {
+      get(target, prop, receiver) {
+        switch (prop) {
+          case Symbol.metroProxy:
+            return true;
+            break;
+          case Symbol.metroSource:
+            return body;
+            break;
+          case "toString":
+            return function() {
+              return "" + body;
+            };
+            break;
+        }
+        if (body && typeof body == "object") {
+          if (prop in body) {
+            if (typeof body[prop] == "function") {
+              return function(...args) {
+                return body[prop].apply(body, args);
+              };
+            }
+            return body[prop];
+          }
+        }
+        if (prop in target && prop != "toString") {
+          if (typeof target[prop] == "function") {
+            return function(...args) {
+              return target[prop].apply(target, args);
+            };
+          }
+          return target[prop];
+        }
+      },
+      has(target, prop) {
+        if (body && typeof body == "object") {
+          return prop in body;
+        } else {
+          return prop in target;
+        }
+      },
+      ownKeys(target) {
+        if (body && typeof body == "object") {
+          return Reflect.ownKeys(body);
+        } else {
+          return Reflect.ownKeys(target);
+        }
+      },
+      getOwnPropertyDescriptor(target, prop) {
+        if (body && typeof body == "object") {
+          return Object.getOwnPropertyDescriptor(body, prop);
+        } else {
+          return Object.getOwnPropertyDescriptor(target, prop);
+        }
+      }
+    });
+  }
+  function getRequestParams(req, current) {
+    let params = current || {};
+    if (!params.url && current.url) {
+      params.url = current.url;
+    }
+    for (let prop of [
+      "method",
+      "headers",
+      "body",
+      "mode",
+      "credentials",
+      "cache",
+      "redirect",
+      "referrer",
+      "referrerPolicy",
+      "integrity",
+      "keepalive",
+      "signal",
+      "priority",
+      "url"
+    ]) {
+      if (typeof req[prop] == "function") {
+        req[prop](params[prop], params);
+      } else if (typeof req[prop] != "undefined") {
+        if (prop == "url") {
+          params.url = url(params.url, req.url);
+        } else if (prop == "headers") {
+          params.headers = new Headers(current.headers);
+          if (!(req.headers instanceof Headers)) {
+            req.headers = new Headers(req.headers);
+          }
+          for (let [key, value] of req.headers.entries()) {
+            params.headers.set(key, value);
+          }
+        } else {
+          params[prop] = req[prop];
+        }
+      }
+    }
+    return params;
+  }
+  function request(...options) {
+    let requestParams = {
+      url: typeof window != "undefined" ? window.location : "https://localhost/",
+      duplex: "half"
+      // required when setting body to ReadableStream, just set it here by default already
+    };
+    for (let option of options) {
+      if (typeof option == "string" || option instanceof URL || option instanceof URLSearchParams) {
+        requestParams.url = url(requestParams.url, option);
+      } else if (option && (option instanceof FormData || option instanceof ReadableStream || option instanceof Blob || option instanceof ArrayBuffer || option instanceof DataView)) {
+        requestParams.body = option;
+      } else if (option && typeof option == "object") {
+        Object.assign(requestParams, getRequestParams(option, requestParams));
+      }
+    }
+    let body = requestParams.body;
+    if (body) {
+      if (typeof body == "object" && !(body instanceof String) && !(body instanceof ReadableStream) && !(body instanceof Blob) && !(body instanceof ArrayBuffer) && !(body instanceof DataView) && !(body instanceof FormData) && !(body instanceof URLSearchParams) && (typeof TypedArray == "undefined" || !(body instanceof TypedArray))) {
+        requestParams.body = JSON.stringify(body);
+      }
+    }
+    let r = new Request(requestParams.url, requestParams);
+    Object.freeze(r);
+    return new Proxy(r, {
+      get(target, prop, receiver) {
+        switch (prop) {
+          case Symbol.metroSsource:
+            return target;
+            break;
+          case Symbol.metroProxy:
+            return true;
+            break;
+          case "with":
+            return function(...options2) {
+              if (body) {
+                options2.unshift({ body });
+              }
+              return request(target, ...options2);
+            };
+            break;
+          case "toString":
+          case "toJSON":
+            return function() {
+              return target[prop].apply(target);
+            };
+            break;
+          case "blob":
+          case "text":
+          case "json":
+            return function() {
+              return target[prop].apply(target);
+            };
+            break;
+          case "body":
+            if (!body) {
+              body = target.body;
+            }
+            if (body) {
+              if (body[Symbol.metroProxy]) {
+                return body;
+              }
+              return bodyProxy(body, target);
+            }
+            break;
+        }
+        if (target[prop] instanceof Function) {
+          return target[prop].bind(target);
+        }
+        return target[prop];
+      }
+    });
+  }
+  function getResponseParams(res, current) {
+    let params = current || {};
+    if (!params.url && current.url) {
+      params.url = current.url;
+    }
+    for (let prop of ["status", "statusText", "headers", "body", "url", "type", "redirected"]) {
+      if (typeof res[prop] == "function") {
+        res[prop](params[prop], params);
+      } else if (typeof res[prop] != "undefined") {
+        if (prop == "url") {
+          params.url = new URL(res.url, params.url || "https://localhost/");
+        } else {
+          params[prop] = res[prop];
+        }
+      }
+    }
+    return params;
+  }
+  function response(...options) {
+    let responseParams = {};
+    for (let option of options) {
+      if (typeof option == "string") {
+        responseParams.body = option;
+      } else if (option instanceof Response) {
+        Object.assign(responseParams, getResponseParams(option, responseParams));
+      } else if (option && typeof option == "object") {
+        if (option instanceof FormData || option instanceof Blob || option instanceof ArrayBuffer || option instanceof DataView || option instanceof ReadableStream || option instanceof URLSearchParams || option instanceof String || typeof TypedArray != "undefined" && option instanceof TypedArray) {
+          responseParams.body = option;
+        } else {
+          Object.assign(responseParams, getResponseParams(option, responseParams));
+        }
+      }
+    }
+    let r = new Response(responseParams.body, responseParams);
+    Object.freeze(r);
+    return new Proxy(r, {
+      get(target, prop, receiver) {
+        switch (prop) {
+          case Symbol.metroProxy:
+            return true;
+            break;
+          case Symbol.metroSource:
+            return target;
+            break;
+          case "with":
+            return function(...options2) {
+              return response(target, ...options2);
+            };
+            break;
+          case "body":
+            if (responseParams.body) {
+              if (responseParams.body[Symbol.metroProxy]) {
+                return responseParams.body;
+              }
+              return bodyProxy(responseParams.body, target);
+            } else {
+              return bodyProxy("", target);
+            }
+            break;
+          case "ok":
+            return target.status >= 200 && target.status < 400;
+            break;
+          case "headers":
+            return target.headers;
+            break;
+          default:
+            if (prop in responseParams && prop != "toString") {
+              return responseParams[prop];
+            }
+            if (prop in target && prop != "toString") {
+              if (typeof target[prop] == "function") {
+                return function(...args) {
+                  return target[prop].apply(target, args);
+                };
+              }
+              return target[prop];
+            }
+            break;
+        }
+        return void 0;
+      }
+    });
+  }
+  function appendSearchParams(url2, params) {
+    if (typeof params == "function") {
+      params(url2.searchParams, url2);
+    } else {
+      params = new URLSearchParams(params);
+      params.forEach((value, key) => {
+        url2.searchParams.append(key, value);
+      });
+    }
+  }
+  function url(...options) {
+    let validParams = [
+      "hash",
+      "host",
+      "hostname",
+      "href",
+      "password",
+      "pathname",
+      "port",
+      "protocol",
+      "username",
+      "search",
+      "searchParams"
+    ];
+    let u = new URL("https://localhost/");
+    for (let option of options) {
+      if (typeof option == "string" || option instanceof String) {
+        u = new URL(option, u);
+      } else if (option instanceof URL || typeof Location != "undefined" && option instanceof Location) {
+        u = new URL(option);
+      } else if (option instanceof URLSearchParams) {
+        appendSearchParams(u, option);
+      } else if (option && typeof option == "object") {
+        for (let param in option) {
+          if (param == "search") {
+            if (typeof option.search == "function") {
+              option.search(u.search, u);
+            } else {
+              u.search = new URLSearchParams(option.search);
+            }
+          } else if (param == "searchParams") {
+            appendSearchParams(u, option.searchParams);
+          } else {
+            if (!validParams.includes(param)) {
+              throw metroError("metro.url: unknown url parameter " + metroURL + "url/unknown-param-name/", param);
+            }
+            if (typeof option[param] == "function") {
+              option[param](u[param], u);
+            } else if (typeof option[param] == "string" || option[param] instanceof String || typeof option[param] == "number" || option[param] instanceof Number || typeof option[param] == "boolean" || option[param] instanceof Boolean) {
+              u[param] = "" + option[param];
+            } else if (typeof option[param] == "object" && option[param].toString) {
+              u[param] = option[param].toString();
+            } else {
+              throw metroError("metro.url: unsupported value for " + param + " " + metroURL + "url/unsupported-param-value/", options[param]);
+            }
+          }
+        }
+      } else {
+        throw metroError("metro.url: unsupported option value " + metroURL + "url/unsupported-option-value/", option);
+      }
+    }
+    Object.freeze(u);
+    return new Proxy(u, {
+      get(target, prop, receiver) {
+        switch (prop) {
+          case Symbol.metroProxy:
+            return true;
+            break;
+          case Symbol.metroSource:
+            return target;
+            break;
+          case "with":
+            return function(...options2) {
+              return url(target, ...options2);
+            };
+            break;
+          case "toString":
+          case "toJSON":
+            return function() {
+              return target[prop]();
+            };
+            break;
+        }
+        return target[prop];
+      }
+    });
+  }
+  function formdata(...options) {
+    var params = new FormData();
+    for (let option of options) {
+      if (option instanceof FormData) {
+        for (let entry of option.entries()) {
+          params.append(entry[0], entry[1]);
+        }
+      } else if (option && typeof option == "object") {
+        for (let entry of Object.entries(option)) {
+          if (Array.isArray(entry[1])) {
+            for (let value of entry[1]) {
+              params.append(entry[0], value);
+            }
+          } else {
+            params.append(entry[0], entry[1]);
+          }
+        }
+      } else {
+        throw new metroError("metro.formdata: unknown option type, only FormData or Object supported", option);
+      }
+    }
+    Object.freeze(params);
+    return new Proxy(params, {
+      get: (target, prop, receiver) => {
+        switch (prop) {
+          case Symbol.metroProxy:
+            return true;
+            break;
+          case Symbol.metroSource:
+            return target;
+            break;
+          case "with":
+            return function(...options2) {
+              return formdata(target, ...options2);
+            };
+            break;
+        }
+        return target[prop];
+      }
+    });
+  }
+  var metroConsole = {
+    error: (message, ...details) => {
+      console.error("\u24C2\uFE0F  ", message, ...details);
+    },
+    info: (message, ...details) => {
+      console.info("\u24C2\uFE0F  ", message, ...details);
+    },
+    group: (name) => {
+      console.group("\u24C2\uFE0F  " + name);
+    },
+    groupEnd: (name) => {
+      console.groupEnd("\u24C2\uFE0F  " + name);
+    }
+  };
+  function metroError(message, ...details) {
+    metroConsole.error(message, ...details);
+    return new Error(message, ...details);
+  }
+  var trace = {
+    /**
+     * Adds a named tracer function
+     * @param {string} name - the name of the tracer
+     * @param {Function} tracer - the tracer function to call
+     */
+    add(name, tracer) {
+      Client.tracers[name] = tracer;
+    },
+    /**
+     * Removes a named tracer function
+     * @param {string} name
+     */
+    delete(name) {
+      delete Client.tracers[name];
+    },
+    /**
+     * Removes all tracer functions
+     */
+    clear() {
+      Client.tracers = {};
+    },
+    /**
+     * Returns a set of request and response tracer functions that use the
+     * console.group feature to shows nested request/response pairs, with
+     * most commonly needed information for debugging
+     */
+    group() {
+      let group = 0;
+      return {
+        request: (req, middleware) => {
+          group++;
+          metroConsole.group(group);
+          metroConsole.info(req?.url, req, middleware);
+        },
+        response: (res, middleware) => {
+          metroConsole.info(res?.body ? res.body[Symbol.metroSource] : null, res, middleware);
+          metroConsole.groupEnd(group);
+          group--;
+        }
+      };
+    }
+  };
+
+  // src/mw/json.mjs
+  function jsonmw(options) {
+    options = Object.assign({
+      reviver: null,
+      replacer: null,
+      space: ""
+    }, options);
+    return async (req, next) => {
+      if (["POST", "PUT", "PATCH", "QUERY"].includes(req.method)) {
+        req = req.with({
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          }
+        });
+        if (req.body && typeof req.body[Symbol.metroSource] == "object") {
+          req = req.with({
+            body: JSON.stringify(req.body[Symbol.metroSource], options.replacer, options.space)
+          });
+        }
+      } else {
+        req = req.with({
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+      }
+      let res = await next(req);
+      let body = await res.text();
+      let json = JSON.parse(body, options.reviver);
+      return res.with({
+        body: json
+      });
+    };
+  }
+
+  // src/mw/thrower.mjs
+  function thrower(options) {
+    return async (req, next) => {
+      let res = await next(req);
+      if (!res.ok) {
+        if (options && typeof options[res.status] == "function") {
+          res = options[res.status].apply(res, req);
+        } else {
+          throw new Error(res.status + ": " + res.statusText, {
+            cause: res
+          });
+        }
+      }
+      return res;
+    };
+  }
+
+  // src/everything.mjs
+  window.metro = Object.assign({}, metro_exports, {
+    mw: {
+      jsonmw,
+      thrower
+    }
+  });
+})();
 //# sourceMappingURL=everything.js.map
