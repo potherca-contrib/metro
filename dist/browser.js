@@ -322,19 +322,6 @@
               return request(target, ...options2);
             };
             break;
-          case "toString":
-          case "toJSON":
-            return function() {
-              return target[prop].apply(target);
-            };
-            break;
-          case "blob":
-          case "text":
-          case "json":
-            return function() {
-              return target[prop].apply(target);
-            };
-            break;
           case "body":
             if (!body) {
               body = target.body;
@@ -513,12 +500,9 @@
               return url(target, ...options2);
             };
             break;
-          case "toString":
-          case "toJSON":
-            return function() {
-              return target[prop]();
-            };
-            break;
+        }
+        if (target[prop] instanceof Function) {
+          return target[prop].bind(target);
         }
         return target[prop];
       }
@@ -560,6 +544,9 @@
               return formdata(target, ...options2);
             };
             break;
+        }
+        if (target[prop] instanceof Function) {
+          return target[prop].bind(target);
         }
         return target[prop];
       }

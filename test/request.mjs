@@ -85,7 +85,7 @@ tap.test('bodyFormData', t => {
 		body: fd
 	})
 	t.ok(req.body instanceof ReadableStream)
-	t.ok(req.body[metro.symbols.source] instanceof FormData)
+	t.ok(req.body[Symbol.metroSource] instanceof FormData)
 	t.equal(req.body.get('foo'), 'bar')
 	t.end()
 })
@@ -97,7 +97,7 @@ tap.test('inferBodyFromType', t => {
 		method: 'POST'
 	}, fd)
 	t.ok(req.body instanceof ReadableStream)
-	t.ok(req.body[metro.symbols.source] instanceof FormData)
+	t.ok(req.body[Symbol.metroSource] instanceof FormData)
 	t.equal(req.body.get('foo'), 'bar')
 	t.end()
 })

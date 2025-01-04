@@ -40,7 +40,7 @@ tap.test('bodyFormData', t => {
 	fd.append('foo','bar')
 	let res = metro.response(fd)
 	t.ok(res.body instanceof ReadableStream)
-	t.ok(res.body[metro.symbols.isProxy])
+	t.ok(res.body[Symbol.metroProxy])
 	let x = res.body.get('foo')
 	t.equal(res.body.get('foo'), 'bar')
 	t.end()
