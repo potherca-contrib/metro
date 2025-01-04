@@ -1,10 +1,14 @@
-import * as metro from './metro.mjs'
+import * as m from './metro.mjs'
 import jsonmw from './mw/json.mjs'
 import thrower from './mw/thrower.mjs'
 
-window.metro = Object.assign({}, metro, {
+const metro = Object.assign({}, m, {
 	mw: {
 		jsonmw,
 		thrower
 	}
 })
+
+window.metro = metro
+
+export default metro
