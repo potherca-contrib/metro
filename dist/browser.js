@@ -107,14 +107,6 @@
       }
       const metrofetch = async function browserFetch(req2) {
         if (req2[Symbol.metroProxy]) {
-          if (req2.body) {
-            try {
-              let r = req2.with();
-              let f = await r.formData();
-              console.log("hier", f);
-            } catch (e) {
-            }
-          }
           req2 = req2[Symbol.metroSource];
         }
         const res = await fetch(req2);
@@ -316,7 +308,7 @@
     return new Proxy(r, {
       get(target, prop, receiver) {
         switch (prop) {
-          case Symbol.metroSsource:
+          case Symbol.metroSource:
             return target;
             break;
           case Symbol.metroProxy:
