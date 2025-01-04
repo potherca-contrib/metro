@@ -107,7 +107,12 @@
       }
       const metrofetch = async function browserFetch(req2) {
         if (req2[Symbol.metroProxy]) {
-          req2 = req2[Symbol.metroSource];
+          if (req2.body && req2.body[Symbol.metroSource]) {
+            let body = req2.body[Symbol.metroSource];
+            req2 = new Request(req2[Symbol.metroSource], { body });
+          } else {
+            req2 = req2[Symbol.metroSource];
+          }
         }
         const res = await fetch(req2);
         return response(res);
@@ -613,6 +618,7 @@
       };
     }
   };
+  trace.add("group", trace.group());
 
   // src/mw/json.mjs
   function jsonmw(options) {
@@ -668,11 +674,13 @@
   }
 
   // src/everything.mjs
-  window.metro = Object.assign({}, metro_exports, {
+  var metro = Object.assign({}, metro_exports, {
     mw: {
       jsonmw,
       thrower
     }
   });
+  window.metro = metro;
+  var everything_default = metro;
 })();
 //# sourceMappingURL=everything.js.map
