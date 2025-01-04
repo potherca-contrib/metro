@@ -398,7 +398,7 @@ export function request(...options)
 	return new Proxy(r, {
 		get(target, prop, receiver) {
 			switch(prop) {
-				case Symbol.metroSsource:
+				case Symbol.metroSource:
 					return target
 				break
 				case Symbol.metroProxy:
