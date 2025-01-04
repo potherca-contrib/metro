@@ -412,19 +412,6 @@ export function request(...options)
 						return request(target, ...options)
 					}
 				break
-				case 'toString':
-				case 'toJSON':
-					return function() {
-						return target[prop].apply(target)
-					}
-				break
-				case 'blob':
-				case 'text':
-				case 'json':
-					return function() {
-						return target[prop].apply(target)
-					}
-				break
 				case 'body':
 					// Request.body is always a ReadableStream
 					// which is a horrible API, if you want to
@@ -649,12 +636,9 @@ export function url(...options)
 						return url(target, ...options)
 					}
 				break
-				case 'toString':
-				case 'toJSON':
-					return function() {
-						return target[prop]()
-					}
-				break
+			}
+			if (target[prop] instanceof Function) {
+				return target[prop].bind(target)
 			}
 			return target[prop]
 		}
@@ -709,12 +693,9 @@ export function formdata(...options)
 						return formdata(target, ...options)
 					}
 				break
-				// case 'toString':
-				// case 'toJSON':
-				// 	return function() {
-				// 		return target[prop]()
-				// 	}
-				// break
+			}
+			if (target[prop] instanceof Function) {
+				return target[prop].bind(target)
 			}
 			return target[prop]
 		}
