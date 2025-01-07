@@ -1,3 +1,5 @@
 import * as metro from './metro.mjs'
 
-window.metro = metro
+globalThis.metro = metro
+
+export default metro

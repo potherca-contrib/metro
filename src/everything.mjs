@@ -9,6 +9,6 @@ const metro = Object.assign({}, m, {
 	}
 })
 
-window.metro = metro
+globalThis.metro = metro
 
 export default metro
