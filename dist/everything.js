@@ -618,7 +618,6 @@
       };
     }
   };
-  trace.add("group", trace.group());
 
   // src/mw/json.mjs
   function jsonmw(options) {
@@ -680,7 +679,7 @@
       thrower
     }
   });
-  window.metro = metro;
+  globalThis.metro = metro;
   var everything_default = metro;
 })();
 //# sourceMappingURL=everything.js.map

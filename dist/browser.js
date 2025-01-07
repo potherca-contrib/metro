@@ -618,9 +618,9 @@
       };
     }
   };
-  trace.add("group", trace.group());
 
   // src/browser.mjs
-  window.metro = metro_exports;
+  globalThis.metro = metro_exports;
+  var browser_default = metro_exports;
 })();
 //# sourceMappingURL=browser.js.map
