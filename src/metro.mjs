@@ -323,21 +323,28 @@ function getRequestParams(req, current)
 	for(let prop of ['method','headers','body','mode','credentials','cache','redirect',
 		'referrer','referrerPolicy','integrity','keepalive','signal',
 		'priority','url']) {
-		if (typeof req[prop] == 'function') {
-			req[prop](params[prop], params)
-		} else if (typeof req[prop] != 'undefined') {
+		let value = req[prop]
+		if (typeof value=='undefined' || value == null) {
+			continue
+		}
+		if (value?.[Symbol.metroProxy]) {
+			value = value[Symbol.metroSource]
+		}
+		if (typeof value == 'function') {
+			value(params[prop], params)
+		} else {
 			if (prop == 'url') {
-				params.url = url(params.url, req.url)
+				params.url = url(params.url, value)
 			} else if (prop == 'headers') {
 				params.headers = new Headers(current.headers)
-				if (!(req.headers instanceof Headers)) {
-					req.headers = new Headers(req.headers)
+				if (!(value instanceof Headers)) {
+					value = new Headers(req.headers)
 				}
-				for (let [key, value] of req.headers.entries()) {
-					params.headers.set(key, value)
+				for (let [key, val] of value.entries()) {
+					params.headers.set(key, val)
 				}
 			} else {
-				params[prop] = req[prop]
+				params[prop] = value
 			}
 		}
 	}
@@ -453,13 +460,20 @@ function getResponseParams(res, current)
 		params.url = current.url
 	}
 	for(let prop of ['status','statusText','headers','body','url','type','redirected']) {
-		if (typeof res[prop] == 'function') {
-			res[prop](params[prop], params)
-		} else if (typeof res[prop] != 'undefined') {
+		let value = res[prop]
+		if (typeof value == 'undefined' || value == null) {
+			continue
+		}
+		if (value?.[Symbol.metroProxy]) {
+			value = value[Symbol.metroSource]
+		}
+		if (typeof value == 'function') {
+			value(params[prop], params)
+		} else {
 			if (prop == 'url') {
-				params.url = new URL(res.url, params.url || 'https://localhost/')
+				params.url = new URL(value, params.url || 'https://localhost/')
 			} else {
-				params[prop] = res[prop]
+				params[prop] = value
 			}
 		}
 	}
