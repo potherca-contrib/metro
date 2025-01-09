@@ -12,7 +12,7 @@ tap.test('start', async t => {
 		}
 	})
 	let res = await c.post(req)
-	t.equal(res.body.foo, 'bar')
+	t.equal(res.data.foo, 'bar')
 	t.end()
 })
 
@@ -23,6 +23,6 @@ tap.test('start', async t => {
 			foo: 'bar'
 		}
 	})
-	t.equal(res.body.foo, 'bar')
+	t.equal(res.data.foo, 'bar')
 	t.end()
 })

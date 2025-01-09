@@ -107,12 +107,7 @@
       }
       const metrofetch = async function browserFetch(req2) {
         if (req2[Symbol.metroProxy]) {
-          if (req2.body && req2.body[Symbol.metroSource]) {
-            let body = req2.body[Symbol.metroSource];
-            req2 = new Request(req2[Symbol.metroSource], { body });
-          } else {
-            req2 = req2[Symbol.metroSource];
-          }
+          req2 = req2[Symbol.metroSource];
         }
         const res = await fetch(req2);
         return response(res);
@@ -149,103 +144,6 @@
   function client(...options) {
     return new Client(...options);
   }
-  function bodyProxy(body, r) {
-    let source = r.body;
-    if (!source) {
-      if (body === null) {
-        source = new ReadableStream();
-      } else if (body instanceof ReadableStream) {
-        source = body;
-      } else if (body instanceof Blob) {
-        source = body.stream();
-      } else {
-        source = new ReadableStream({
-          start(controller) {
-            let chunk;
-            switch (typeof body) {
-              case "object":
-                if (typeof body.toString == "function") {
-                  chunk = body.toString();
-                } else if (body instanceof FormData) {
-                  chunk = new URLSearchParams(body).toString();
-                } else if (body instanceof ArrayBuffer || ArrayBuffer.isView(body)) {
-                  chunk = body;
-                } else {
-                  throw metroError("Cannot convert body to ReadableStream", body);
-                }
-                break;
-              case "string":
-              case "number":
-              case "boolean":
-                chunk = body;
-                break;
-              default:
-                throw metroError("Cannot convert body to ReadableStream", body);
-                break;
-            }
-            controller.enqueue(chunk);
-            controller.close();
-          }
-        });
-      }
-    }
-    return new Proxy(source, {
-      get(target, prop, receiver) {
-        switch (prop) {
-          case Symbol.metroProxy:
-            return true;
-            break;
-          case Symbol.metroSource:
-            return body;
-            break;
-          case "toString":
-            return function() {
-              return "" + body;
-            };
-            break;
-        }
-        if (body && typeof body == "object") {
-          if (prop in body) {
-            if (typeof body[prop] == "function") {
-              return function(...args) {
-                return body[prop].apply(body, args);
-              };
-            }
-            return body[prop];
-          }
-        }
-        if (prop in target && prop != "toString") {
-          if (typeof target[prop] == "function") {
-            return function(...args) {
-              return target[prop].apply(target, args);
-            };
-          }
-          return target[prop];
-        }
-      },
-      has(target, prop) {
-        if (body && typeof body == "object") {
-          return prop in body;
-        } else {
-          return prop in target;
-        }
-      },
-      ownKeys(target) {
-        if (body && typeof body == "object") {
-          return Reflect.ownKeys(body);
-        } else {
-          return Reflect.ownKeys(target);
-        }
-      },
-      getOwnPropertyDescriptor(target, prop) {
-        if (body && typeof body == "object") {
-          return Object.getOwnPropertyDescriptor(body, prop);
-        } else {
-          return Object.getOwnPropertyDescriptor(target, prop);
-        }
-      }
-    });
-  }
   function getRequestParams(req, current) {
     let params = current || {};
     if (!params.url && current.url) {
@@ -275,7 +173,7 @@
         value = value[Symbol.metroSource];
       }
       if (typeof value == "function") {
-        value(params[prop], params);
+        params[prop] = value(params[prop], params);
       } else {
         if (prop == "url") {
           params.url = url(params.url, value);
@@ -291,6 +189,9 @@
           params[prop] = value;
         }
       }
+    }
+    if (req instanceof Request && req.data) {
+      params.body = req.data;
     }
     return params;
   }
@@ -309,10 +210,10 @@
         Object.assign(requestParams, getRequestParams(option, requestParams));
       }
     }
-    let body = requestParams.body;
-    if (body) {
-      if (typeof body == "object" && !(body instanceof String) && !(body instanceof ReadableStream) && !(body instanceof Blob) && !(body instanceof ArrayBuffer) && !(body instanceof DataView) && !(body instanceof FormData) && !(body instanceof URLSearchParams) && (typeof TypedArray == "undefined" || !(body instanceof TypedArray))) {
-        requestParams.body = JSON.stringify(body);
+    let data = requestParams.body;
+    if (data) {
+      if (typeof data == "object" && !(data instanceof String) && !(data instanceof ReadableStream) && !(data instanceof Blob) && !(data instanceof ArrayBuffer) && !(data instanceof DataView) && !(data instanceof FormData) && !(data instanceof URLSearchParams) && (typeof TypedArray == "undefined" || !(data instanceof TypedArray))) {
+        requestParams.body = JSON.stringify(data);
       }
     }
     let r = new Request(requestParams.url, requestParams);
@@ -328,25 +229,21 @@
             break;
           case "with":
             return function(...options2) {
-              if (body) {
-                options2.unshift({ body });
+              if (data) {
+                options2.unshift({ body: data });
               }
               return request(target, ...options2);
             };
             break;
           case "body":
-            if (!body) {
-              body = target.body;
-            }
-            if (body) {
-              if (body[Symbol.metroProxy]) {
-                return body;
-              }
-              return bodyProxy(body, target);
-            }
+            break;
+          case "data":
+            return data;
             break;
         }
         if (target[prop] instanceof Function) {
+          if (prop === "clone") {
+          }
           return target[prop].bind(target);
         }
         return target[prop];
@@ -367,7 +264,7 @@
         value = value[Symbol.metroSource];
       }
       if (typeof value == "function") {
-        value(params[prop], params);
+        params[prop] = value(params[prop], params);
       } else {
         if (prop == "url") {
           params.url = new URL(value, params.url || "https://localhost/");
@@ -375,6 +272,9 @@
           params[prop] = value;
         }
       }
+    }
+    if (res instanceof Response && res.data) {
+      params.body = res.data;
     }
     return params;
   }
@@ -393,6 +293,10 @@
         }
       }
     }
+    let data = void 0;
+    if (responseParams.body) {
+      data = responseParams.body;
+    }
     let r = new Response(responseParams.body, responseParams);
     Object.freeze(r);
     return new Proxy(r, {
@@ -409,37 +313,17 @@
               return response(target, ...options2);
             };
             break;
-          case "body":
-            if (responseParams.body) {
-              if (responseParams.body[Symbol.metroProxy]) {
-                return responseParams.body;
-              }
-              return bodyProxy(responseParams.body, target);
-            } else {
-              return bodyProxy("", target);
-            }
+          case "data":
+            return data;
             break;
           case "ok":
             return target.status >= 200 && target.status < 400;
             break;
-          case "headers":
-            return target.headers;
-            break;
-          default:
-            if (prop in responseParams && prop != "toString") {
-              return responseParams[prop];
-            }
-            if (prop in target && prop != "toString") {
-              if (typeof target[prop] == "function") {
-                return function(...args) {
-                  return target[prop].apply(target, args);
-                };
-              }
-              return target[prop];
-            }
-            break;
         }
-        return void 0;
+        if (typeof target[prop] == "function") {
+          return target[prop].bind(target);
+        }
+        return target[prop];
       }
     });
   }

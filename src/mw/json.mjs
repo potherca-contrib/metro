@@ -15,9 +15,9 @@ export default function jsonmw(options) {
 	                'Accept':'application/json'
 				}
 			})
-			if (req.body && typeof req.body[Symbol.metroSource] == 'object') {
+			if (req.data && typeof req.data=='object' && !(req.data instanceof ReadableStream)) {
 				req = req.with({
-					body: JSON.stringify(req.body[Symbol.metroSource], options.replacer, options.space)
+					body: JSON.stringify(req.data, options.replacer, options.space)
 				})
 			}
 		} else {

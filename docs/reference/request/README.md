@@ -14,7 +14,7 @@ If you enter a string as option, it will always be interpreted as a URL. Just li
 let req = metro.request('https://example.com/')
 ```
 
-## default request methods
+## default Request methods
 
 - [`arrayBuffer()`](https://developer.mozilla.org/en-US/docs/Web/API/Request/arrayBuffer)
 - [`blob()`](https://developer.mozilla.org/en-US/docs/Web/API/Request/blob)
@@ -23,6 +23,10 @@ let req = metro.request('https://example.com/')
 - [`json()`](https://developer.mozilla.org/en-US/docs/Web/API/Request/json)
 - [`text()`](https://developer.mozilla.org/en-US/docs/Web/API/Request/text)
 
-## metro request methods
+## metro Request methods
 
 - [`with()`](./with.md)
+
+## metro Request properties
+
+- [`data`](./data.md)

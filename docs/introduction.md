@@ -20,7 +20,7 @@ const client = metro.client({
 let response = await client.get('/repos/muze-nl/metro/commits')
 
 if (response.ok) {
-  for ( const commit of response.body ) {
+  for ( const commit of response.data ) {
     console.log(commit.commit.message)
   }
 }

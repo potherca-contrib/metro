@@ -25,6 +25,7 @@ if (!Symbol.metroSource) {
  * @method head
  * @method options
  * @method query
+ * @method fetch
  */
 class Client
 {
@@ -125,16 +126,7 @@ class Client
 		const metrofetch = async function browserFetch(req)
 		{
 			if (req[Symbol.metroProxy]) {
-				// even though a Proxy is supposed to be 'invisible'
-				// fetch() doesn't work with the proxy (in Firefox), 
-				// you need the actual Request object here
-				// and the actual body if you use e.g. FormData
-				if (req.body && req.body[Symbol.metroSource]) {
-					let body = req.body[Symbol.metroSource]
-					req = new Request(req[Symbol.metroSource], { body })
-				} else {
-					req = req[Symbol.metroSource]
-				}
+				req = req[Symbol.metroSource]
 			}
 			const res = await fetch(req)
 			return response(res)
@@ -205,114 +197,6 @@ function appendHeaders(r, headers)
 	})
 }
 
-function bodyProxy(body, r)
-{
-	let source = r.body
-	if (!source) {
-		//Firefox does not allow access to Request.body (undefined)
-		//Chrome and Nodejs do, so mimic the correct (documented)
-		//result here
-		if (body === null) {
-			source = new ReadableStream()
-		} else if (body instanceof ReadableStream) {
-			source = body
-		} else if (body instanceof Blob) {
-			source = body.stream()
-		} else {
-			source = new ReadableStream({
-				start(controller) {
-					let chunk
-					switch(typeof body) {
-						case 'object':
-							if (typeof body.toString == 'function') {
-								// also catches URLSearchParams
-								chunk = body.toString()
-							} else if (body instanceof FormData) {
-								chunk = new URLSearchParams(body).toString()
-							} else if (body instanceof ArrayBuffer
-								|| ArrayBuffer.isView(body)
-							) {
-								// catchs TypedArrays - e.g. Uint16Array
-								chunk = body
-							} else {
-								throw metroError('Cannot convert body to ReadableStream', body)
-							}
-						break
-						case 'string':
-						case 'number':
-						case 'boolean':
-							chunk = body
-						break
-						default:
-							throw metroError('Cannot convert body to ReadableStream', body)
-						break
-					}
-					controller.enqueue(chunk)
-					controller.close()
-				}
-			})
-		}
-	}
-	return new Proxy(source, {
-		get(target, prop, receiver) {
-			switch (prop) {
-				case Symbol.metroProxy:
-					return true
-				break
-				case Symbol.metroSource:
-					return body
-				break
-				case 'toString':
-					return function() {
-						return ''+body
-					}
-				break
-			}
-			if (body && typeof body == 'object') {
-				if (prop in body) {
-					if (typeof body[prop] == 'function') {
-						return function(...args) {
-							return body[prop].apply(body, args)
-						}
-					}
-					return body[prop]
-				}
-			}
-			if (prop in target && prop != 'toString') {
-				// skipped toString, since it has no usable output
-				// and body may have its own toString
-				if (typeof target[prop] == 'function') {
-					return function(...args) {
-						return target[prop].apply(target, args)
-					}
-				}
-				return target[prop]
-			}
-		},
-		has(target, prop) {
-			if (body && typeof body == 'object') {
-				return prop in body
-			} else {
-				return prop in target
-			}
-		},
-		ownKeys(target) {
-			if (body && typeof body == 'object') {
-				return Reflect.ownKeys(body)
-			} else {
-				return Reflect.ownKeys(target)
-			}
-		},
-		getOwnPropertyDescriptor(target, prop) {
-			if (body && typeof body == 'object') {
-				return Object.getOwnPropertyDescriptor(body,prop)
-			} else {
-				return Object.getOwnPropertyDescriptor(target,prop)
-			}
-		}
-	})
-}
-
 function getRequestParams(req, current)
 {
 	let params = current || {}
@@ -331,7 +215,7 @@ function getRequestParams(req, current)
 			value = value[Symbol.metroSource]
 		}
 		if (typeof value == 'function') {
-			value(params[prop], params)
+			params[prop] = value(params[prop], params)
 		} else {
 			if (prop == 'url') {
 				params.url = url(params.url, value)
@@ -347,6 +231,11 @@ function getRequestParams(req, current)
 				params[prop] = value
 			}
 		}
+	}
+	if (req instanceof Request && req.data) {
+		// Request.body is always transformed into ReadableStreem
+		// metro.request.data is the original body passed to Request()
+		params.body = req.data
 	}
 	return params
 }
@@ -391,19 +280,19 @@ export function request(...options)
 			Object.assign(requestParams, getRequestParams(option, requestParams))
 		}
 	}
-	let body = requestParams.body
-	if (body) {
-		if (typeof body == 'object'
-			&& !(body instanceof String)
-			&& !(body instanceof ReadableStream)
-			&& !(body instanceof Blob)
-			&& !(body instanceof ArrayBuffer)
-			&& !(body instanceof DataView)
-			&& !(body instanceof FormData)
-			&& !(body instanceof URLSearchParams)
-			&& (typeof TypedArray=='undefined' || !(body instanceof TypedArray))
+	let data = requestParams.body
+	if (data) {
+		if (typeof data == 'object'
+			&& !(data instanceof String)
+			&& !(data instanceof ReadableStream)
+			&& !(data instanceof Blob)
+			&& !(data instanceof ArrayBuffer)
+			&& !(data instanceof DataView)
+			&& !(data instanceof FormData)
+			&& !(data instanceof URLSearchParams)
+			&& (typeof TypedArray=='undefined' || !(data instanceof TypedArray))
 		) {
-			requestParams.body = JSON.stringify(body)
+			requestParams.body = JSON.stringify(data)
 		}
 	}
 	let r = new Request(requestParams.url, requestParams)
@@ -419,32 +308,25 @@ export function request(...options)
 				break
 				case 'with':
 					return function(...options) {
-						if (body) { // body is kept in a seperate value, if it set earlier
-							options.unshift({ body }) // unshifted so it can be overridden by options
+						if (data) { // data is kept in a seperate value, if it set earlier
+							options.unshift({ body: data }) // unshifted so it can be overridden by options
 						}
 						return request(target, ...options)
 					}
 				break
 				case 'body':
-					// Request.body is always a ReadableStream
-					// which is a horrible API, if you want to
-					// allow middleware to alter the body
-					// so we keep the original body, wrap a Proxy
-					// around it to keep the ReadableStream api
-					// accessible, but allow access to the original
-					// body value as well
-					if (!body) {
-						body = target.body
-					}
-					if (body) {
-						if (body[Symbol.metroProxy]) {
-							return body
-						}
-						return bodyProxy(body, target)
-					}
+					// FIXME: Firefox doesn't have Request.body
+					// should we provide it here? metro.request.data
+					// is a better alternative
+				break
+				case 'data':
+					return data
 				break
 			}
 			if (target[prop] instanceof Function) {
+				if (prop === 'clone') {
+					// TODO: set req.data as the body of the clone
+				}
 				return target[prop].bind(target)
 			}
 			return target[prop]
@@ -468,7 +350,7 @@ function getResponseParams(res, current)
 			value = value[Symbol.metroSource]
 		}
 		if (typeof value == 'function') {
-			value(params[prop], params)
+			params[prop] = value(params[prop], params)
 		} else {
 			if (prop == 'url') {
 				params.url = new URL(value, params.url || 'https://localhost/')
@@ -476,6 +358,11 @@ function getResponseParams(res, current)
 				params[prop] = value
 			}
 		}
+	}
+	if (res instanceof Response && res.data) {
+		// Response.body is always transformed into ReadableStreem FIXME: check this
+		// metro.response.data is the original body passed to Response()
+		params.body = res.data
 	}
 	return params
 }
@@ -517,6 +404,10 @@ export function response(...options)
 			}
 		}
 	}
+	let data = undefined
+	if (responseParams.body) {
+		data = responseParams.body
+	}
 	let r = new Response(responseParams.body, responseParams)	
 	Object.freeze(r)
 	return new Proxy(r, {
@@ -533,39 +424,19 @@ export function response(...options)
 						return response(target, ...options)
 					}
 				break
-				case 'body':
-					if (responseParams.body) {
-						if (responseParams.body[Symbol.metroProxy]) {
-							return responseParams.body
-						}
-						return bodyProxy(responseParams.body, target)
-					} else {
-						return bodyProxy('',target)
-					}
+				case 'data':
+					// body is turned into ReadableStream
+					// data is the original body param
+					return data
 				break
 				case 'ok':
 					return (target.status>=200) && (target.status<400)
 				break
-				case 'headers':
-					return target.headers
-				break
-				default:
-					if (prop in responseParams && prop != 'toString') {
-						return responseParams[prop]
-					}
-					if (prop in target && prop != 'toString') {
-						// skipped toString, since it has no usable output
-						// and body may have its own toString
-						if (typeof target[prop] == 'function') {
-							return function(...args) {
-								return target[prop].apply(target, args)
-							}
-						}
-						return target[prop]
-					}
-				break
 			}
-			return undefined
+			if (typeof target[prop] == 'function') {
+				return target[prop].bind(target)
+			}
+			return target[prop]
 		}
 	})
 }

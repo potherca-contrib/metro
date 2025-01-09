@@ -73,7 +73,7 @@ tap.test('body', t => {
 		method: 'POST',
 		body: 'This is the body'
 	})
-	t.equal(''+req.body, 'This is the body')
+	t.equal(''+req.data, 'This is the body')
 	t.end()
 })
 
@@ -85,8 +85,8 @@ tap.test('bodyFormData', t => {
 		body: fd
 	})
 	t.ok(req.body instanceof ReadableStream)
-	t.ok(req.body[Symbol.metroSource] instanceof FormData)
-	t.equal(req.body.get('foo'), 'bar')
+	t.ok(req.data instanceof FormData)
+	t.equal(req.data.get('foo'), 'bar')
 	t.end()
 })
 
@@ -97,8 +97,8 @@ tap.test('inferBodyFromType', t => {
 		method: 'POST'
 	}, fd)
 	t.ok(req.body instanceof ReadableStream)
-	t.ok(req.body[Symbol.metroSource] instanceof FormData)
-	t.equal(req.body.get('foo'), 'bar')
+	t.ok(req.data instanceof FormData)
+	t.equal(req.data.get('foo'), 'bar')
 	t.end()
 })
 
@@ -111,10 +111,10 @@ tap.test('bodyObject', t => {
 		body: body
 	})
 	t.ok(req.body instanceof ReadableStream)
-	t.equal(req.body.foo, 'bar')
-	t.ok('foo' in req.body)
-	t.ok(Object.prototype.hasOwnProperty.call(req.body,'foo'))
-	t.ok(req.body.hasOwnProperty('foo'))
+	t.equal(req.data.foo, 'bar')
+	t.ok('foo' in req.data)
+	t.ok(Object.prototype.hasOwnProperty.call(req.data,'foo'))
+	t.ok(req.data.hasOwnProperty('foo'))
 	t.end()
 })
 
@@ -125,7 +125,7 @@ tap.test('bodyString', t => {
 		body: body
 	})
 	t.ok(req.body instanceof ReadableStream)
-	t.equal(req.body+'', 'bar')
+	t.equal(req.data+'', 'bar')
 	t.end()
 })
 
@@ -146,10 +146,10 @@ tap.test('bodyFunction', t => {
 		body: 'This is the body'
 	}, {
 		body: (b, r) => {
-			r.body = b+' altered'
+			return b+' altered'
 		}
 	})
-	t.equal(''+req.body, 'This is the body altered')
+	t.equal(''+req.data, 'This is the body altered')
 	t.end()
 })
 

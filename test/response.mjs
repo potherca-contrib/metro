@@ -3,7 +3,7 @@ import * as metro from '../src/metro.mjs'
 
 tap.test('start', t => {
 	let res = metro.response('body')
-	t.equal(''+res.body, 'body')
+	t.equal(''+res.data, 'body')
 	t.end()
 })
 
@@ -16,7 +16,7 @@ tap.test('copy', t => {
 	})
 	t.equal(res.status, 200)
 	t.equal(res2.status, 201)
-	t.equal(''+res2.body, 'body')
+	t.equal(''+res2.data, 'body')
 	t.end()
 })
 
@@ -40,9 +40,7 @@ tap.test('bodyFormData', t => {
 	fd.append('foo','bar')
 	let res = metro.response(fd)
 	t.ok(res.body instanceof ReadableStream)
-	t.ok(res.body[Symbol.metroProxy])
-	let x = res.body.get('foo')
-	t.equal(res.body.get('foo'), 'bar')
+	t.equal(res.data.get('foo'), 'bar')
 	t.end()
 })
 
@@ -57,10 +55,10 @@ tap.test('bodyReadableStream', async t => {
 tap.test('bodyFunction', t => {
 	let res = metro.response('This is the body', {
 		body: (b, r) => {
-			r.body = b+' altered'
+			return b+' altered'
 		}
 	})
-	t.equal(''+res.body, 'This is the body altered')
+	t.equal(''+res.data, 'This is the body altered')
 	t.end()
 })
 
