@@ -9,6 +9,8 @@ const metro = Object.assign({}, m, {
 	}
 })
 
-globalThis.metro = metro
+if (!globalThis.metro) {
+	globalThis.metro = metro
+}
 
 export default metro
