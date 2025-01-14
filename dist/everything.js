@@ -591,7 +591,9 @@
       thrower
     }
   });
-  globalThis.metro = metro;
+  if (!globalThis.metro) {
+    globalThis.metro = metro;
+  }
   var everything_default = metro;
 })();
 //# sourceMappingURL=everything.js.map

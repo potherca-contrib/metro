@@ -518,7 +518,9 @@
   };
 
   // src/browser.mjs
-  globalThis.metro = metro_exports;
+  if (!globalThis.metro) {
+    globalThis.metro = metro_exports;
+  }
   var browser_default = metro_exports;
 })();
 //# sourceMappingURL=browser.js.map
