@@ -414,6 +414,9 @@
   function formdata(...options) {
     var params = new FormData();
     for (let option of options) {
+      if (option instanceof HTMLFormElement) {
+        option = new FormData(option);
+      }
       if (option instanceof FormData) {
         for (let entry of option.entries()) {
           params.append(entry[0], entry[1]);
