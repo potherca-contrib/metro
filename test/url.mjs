@@ -124,3 +124,17 @@ tap.test('with', t => {
 	t.equal(url.href, 'https://muze.nl/?foo=bar')
 	t.end()
 })
+
+tap.test('relative path', t => {
+	let url = metro.url('https://example.com/foo/bar.html')
+		.with('baz.html')
+	t.equal(url.href, 'https://example.com/foo/baz.html')
+	t.end()
+})
+
+tap.test('absolute path', t => {
+	let url = metro.url('https://example.com/foo/bar.html')
+		.with('/baz.html')
+	t.equal(url.href, 'https://example.com/baz.html')
+	t.end()
+})
