@@ -298,6 +298,9 @@
     if (responseParams.body) {
       data = responseParams.body;
     }
+    if ([101, 204, 205, 304].includes(responseParams.status)) {
+      responseParams.body = null;
+    }
     let r = new Response(responseParams.body, responseParams);
     Object.freeze(r);
     return new Proxy(r, {
