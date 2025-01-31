@@ -408,6 +408,12 @@ export function response(...options)
 	if (responseParams.body) {
 		data = responseParams.body
 	}
+	// if response status is 'null body status', don't set a body
+	// that is response.status in [101, 204, 205, 304 ] 
+	// see: https://fetch.spec.whatwg.org/#statuses
+	if ([101, 204, 205, 304 ].includes(responseParams.status)) {
+		responseParams.body = null
+	}
 	let r = new Response(responseParams.body, responseParams)	
 	Object.freeze(r)
 	return new Proxy(r, {

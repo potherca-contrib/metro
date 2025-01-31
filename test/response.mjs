@@ -69,3 +69,10 @@ tap.test('text', async t => {
 	t.end()
 })
 
+tap.test('null body status', t => {
+	let res = metro.response('body', {
+	 	status: 204
+	})
+	t.equal(res.body, null)
+	t.end()
+})
