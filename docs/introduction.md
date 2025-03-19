@@ -5,8 +5,7 @@
 MetroJS is an HTTPS client with support for middleware. Similar to ExpressJS, but for the client:
 
 ```javascript
-import * as metro from '@muze-nl/metro'
-import jsonmw from '@muze-nl/metro/src/mw/json.mjs'
+import metro from '@muze-nl/metro'
 
 const token = 'my-token'
 
@@ -15,7 +14,7 @@ const client = metro.client({
   headers: {
     'Authorization':'Bearer '+token
   }
-}).with(jsonmw())
+}).with(metro.mw.jsonmw())
 
 let response = await client.get('/repos/muze-nl/metro/commits')
 

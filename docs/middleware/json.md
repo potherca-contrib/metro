@@ -5,10 +5,9 @@ The `jsonmw()` middleware allows you to automatically parse and stringify javasc
 ## Usage
 
 ```javascript
-import * as metro from '@muze-nl/metro'
-import jsonmw from '@muze-nl/metro/src/mw/json.mjs'
+import metro from '@muze-nl/metro'
 
-const client = metro.client().with( jsonmw({
+const client = metro.client().with( metro.mw.jsonmw({
 	space: "\t"
 }) )
 ```
@@ -21,7 +20,7 @@ let response = await client.post(url, {
 })
 let result
 if (response.ok) {
-	result = response.body.something
+	result = response.data.something
 }
 ```
 
@@ -29,7 +28,7 @@ The `jsonmw` middelware will automatically add the `Accept: application/json` he
 
 If the HTTP request supports a body, as in `POST`, `PUT`, `PATCH` and `QUERY`, it will also add the `Content-Type: application/json` header. Any data send as the body of the request, will be turned into json. 
 
-The body of the response is automatically parsed as json.
+The body of the response is automatically parsed as json, and made available as `response.data`.
 
 ## Configuration Options
 

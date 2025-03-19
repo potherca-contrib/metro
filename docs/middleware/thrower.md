@@ -5,10 +5,9 @@ The `throwermw()` middleware will throw Errors when a response returns with a st
 ## Usage
 
 ```javascript
-import * as metro from '@muze-nl/metro'
-import throwermw from '@muze-nl/metro/src/mw/thrower.mjs'
+import metro from '@muze-nl/metro'
 
-const client = metro.client().with( throwermw() )
+const client = metro.client().with( mtro.mw.throwermw() )
 
 try {
 	let response = await client.get('https://example.com/404/')

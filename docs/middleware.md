@@ -28,7 +28,7 @@ async function myMiddleware(req,next) {
 }
 ```
 
-/Note/: Both `metro.request` and `metro.response` have a with function. This allows you to create a new request or response, from the existing one, with one or more options added or changed. The original request or response is not changed. See the [reference](./reference/) for more information.
+/Note/: Both `metro.request` and `metro.response` have a `with()` function. This allows you to create a new request or response, from the existing one, with one or more options added or changed. The original request or response is not changed. See the [reference](./reference/) for more information.
 
 ## Differences to the browser Request and Response objects
 

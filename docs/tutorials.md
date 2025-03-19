@@ -10,7 +10,14 @@ npm install @muze-nl/metro
 
 Then use it like this:
 ```javascript
-import * as metro from '@muze-nl/metro'
+import metro from '@muze-nl/metro'
+```
+
+This gives access to everything included in metro, like the json and thrower middleware. If you want a lighter version, use the exact src/ files, e.g.:
+
+```javascript
+import * as metro from '@muze-nl/metro/src/metro.mjs'
+import jsonmw from '@muze-nl/metro/mw/json.mjs'
 ```
 
 Or you can use a CDN (Content Delivery Network), like this:
@@ -130,6 +137,9 @@ async function postData(data) {
 
 ## JSON middleware
 
+The jsonmw middleware automatically converts data to json, adds the correct headers, and parses responses.
+The response body, if parseable as json, is made available as `response.data`
+
 ```javascript
 import jsonmw from '@muze-nl/metro/src/mw/json.mjs'
 
@@ -140,7 +150,7 @@ async function postData(data) {
 		body: data
 	})
 	if (response.ok) {
-		return response.body
+		return response.data
 	} else {
 		throw new NetworkError(response.status+': '+response.statusText)
 	}
