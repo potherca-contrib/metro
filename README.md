@@ -85,7 +85,7 @@ Both request and response adhere to the [Fetch API](https://developer.mozilla.or
 and automatically passed to your middleware function. The idea is that your middleware function can change the request
 and pass it on to the next middleware or the actual fetch() call, then intercept the response and change that and return it:
 
-```
+```javascript
 async function myMiddleware(req,next) {
   req = req.with('?foo=bar')
   let res = await next(req)
@@ -116,7 +116,7 @@ In addition work is ongoing on these separate middleware libraries:
 Middleware is powerful, but can also be difficult to debug. For this reason MetroJS adds a trace feature. This 
 allows you to add a request and response tracer function, which is called before and after each middleware call:
 
-```
+```javascript
 const client = metro.client()
 metro.trace.add('mytracer', {
   request: (req) => {
@@ -130,7 +130,7 @@ metro.trace.add('mytracer', {
 
 There is a default trace function that shows the call request/response in a nested fashion:
 
-```
+```javascript
 metro.trace.add('group', metro.trace.group())
 ```
 
@@ -140,7 +140,7 @@ You can just create a async function with `(req,next) => res` as its signature. 
 to be able to set options specific for that middleware. The best way to do this is to create a module like
 so:
 
-```
+```javascript
 export default function myMiddleware(options)
 {
   return async (req,next) => {
