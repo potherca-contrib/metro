@@ -25,10 +25,6 @@ permissions:
   # pages to trigger a GitHub Pages build
   pages: write
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -40,15 +36,13 @@ jobs:
         uses: docker://hugomods/hugo:std-go-git-non-root
         with:
           args: >-
-            sh -c '
-              cd docs/
-              && hugo mod init github.com/muze-nl/metro
+            sh -c "cd docs/
+              && hugo mod init 'github.com/muze-nl/metro'
               && hugo mod get -u
               && hugo
                 --gc
                 --minify
-                --baseURL "${{ steps.pages.outputs.base_url }}/"
-            '
+                --baseURL '${{ steps.pages.outputs.base_url }}/'"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/public
