@@ -33,7 +33,7 @@ jobs:
       - uses: actions/configure-pages@v5
         id: pages
       - name: Build with Hugo
-        uses: docker://hugomods/hugo:std-go-git-non-root
+        uses: docker://hugomods/hugo:std-go-git
         with:
           args: >-
             sh -c "cd docs; hugo mod init 'github.com/muze-nl/metro' && hugo mod get -u && hugo --gc --minify --baseURL '${{ steps.pages.outputs.base_url }}/'"
