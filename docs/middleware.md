@@ -1,5 +1,6 @@
 ---
 title: 'Middleware'
+weight: 3
 ---
 # Middleware
 

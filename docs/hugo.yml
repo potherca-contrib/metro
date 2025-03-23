@@ -42,6 +42,12 @@ module:
     # Load custom CSS
     - source: '_/custom.css'
       target: 'assets/css/custom.css'
+    # Use the introduction.md file as the homepage
+    - source: 'introduction.md'
+      target: 'content/_index.md'
+    # Add middleware.md as "section"
+    - source: 'middleware.md'
+      target: 'content/middleware/_index.md'
 # ==============================================================================
 
 # ==============================================================================

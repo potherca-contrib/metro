@@ -1,5 +1,6 @@
 ---
-title: 'MetroJS Tutorial'
+title: 'Tutorial'
+weight: 2
 ---
 # MetroJS Tutorial
 
