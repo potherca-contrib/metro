@@ -8,7 +8,7 @@ on:
       - main
       - feature/docs-in-hugo
     paths:
-      - '.github/workflows/hugo.yaml'
+      - '.github/workflows/github-pages.yaml'
       - 'docs/**'
   # Allow manually triggering the workflow.
   workflow_dispatch:
