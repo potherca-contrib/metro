@@ -30,4 +30,3 @@ const client = metro.client().with( throwermw({
 	}
 }))
 ```
-

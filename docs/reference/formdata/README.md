@@ -14,4 +14,3 @@ let body = metro.formdata({
   ]
 })
 ```
-
