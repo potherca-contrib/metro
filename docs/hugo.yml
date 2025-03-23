@@ -1,0 +1,58 @@
+---
+# ==============================================================================
+# Generic Hugo configuration.
+# For a full list of options see: https://gohugo.io/configuration/all/
+# ------------------------------------------------------------------------------
+baseURL: 'https://muze-nl.github.io/metro/'
+disableHugoGeneratorInject: true
+ignorefiles:
+  - 'go.*'
+  - 'hugo.yml'
+  - 'public/*'
+languageCode: 'en-us'
+title: 'MetroJS'
+# ==============================================================================
+
+# ==============================================================================
+# Markup configuration.
+# For a full list of options see: https://gohugo.io/configuration/markup/
+# ------------------------------------------------------------------------------
+markup:
+  goldmark:
+    renderer:
+      # Allow HTML in Markdown to be rendered as-is
+      unsafe: true
+# ==============================================================================
+
+# ==============================================================================
+# Module configuration.
+# For a full list of options see: https://gohugo.io/configuration/module/
+# ------------------------------------------------------------------------------
+module:
+  imports:
+    - path: github.com/McShelby/hugo-theme-relearn
+  mounts:
+    # Mount the docs/ directory as content root
+    - excludeFiles:
+        - 'go.*'
+        - 'hugo.yml'
+        - 'public/.*'
+      source: './'
+      target: 'content/'
+# ==============================================================================
+
+# ==============================================================================
+# Theme Specific configuration.For a full list of options see:
+# https://mcshelby.github.io/hugo-theme-relearn/configuration/reference/
+# ------------------------------------------------------------------------------
+params:
+  alwaysopen: false
+  collapsibleMenu: true
+  disableGeneratorVersion: true
+  disableInlineCopyToClipBoard: true
+  disableLandingPageButton: true
+  themeVariant:
+    - 'auto'
+    - 'zen-dark'
+    - 'zen-light'
+# ==============================================================================
