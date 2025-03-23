@@ -1,3 +1,6 @@
+---
+title: 'client.patch'
+---
 # client.patch
 
 ```

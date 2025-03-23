@@ -1,3 +1,6 @@
+---
+title: 'metro.symbols'
+---
 # metro.symbols
 
 There are two symbols in metro.symbols:

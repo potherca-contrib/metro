@@ -1,3 +1,6 @@
+---
+title: 'client.delete'
+---
 # client.delete
 
 ```

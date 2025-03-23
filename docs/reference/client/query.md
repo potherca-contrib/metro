@@ -1,3 +1,6 @@
+---
+title: 'client.query'
+---
 # client.query
 
 ```

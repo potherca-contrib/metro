@@ -1,3 +1,6 @@
+---
+title: 'client.put'
+---
 # client.put
 
 ```

@@ -1,3 +1,6 @@
+---
+title: 'MetroJS Tutorial'
+---
 # MetroJS Tutorial
 
 ## Getting Started

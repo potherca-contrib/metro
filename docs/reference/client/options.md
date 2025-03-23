@@ -1,3 +1,6 @@
+---
+title: 'client.options'
+---
 # client.options
 
 ```

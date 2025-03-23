@@ -1,3 +1,6 @@
+---
+title: 'Thrower middleware'
+---
 # Thrower middleware
 
 The `throwermw()` middleware will throw Errors when a response returns with a status in the 400 to 599 tange.

@@ -1,3 +1,6 @@
+---
+title: 'client.get'
+---
 # client.get
 
 ```

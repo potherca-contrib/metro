@@ -1,3 +1,6 @@
+---
+title: 'client.post'
+---
 # client.post
 
 ```

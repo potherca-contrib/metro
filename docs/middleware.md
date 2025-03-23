@@ -1,3 +1,6 @@
+---
+title: 'Middleware'
+---
 # Middleware
 
 ## Using middleware
