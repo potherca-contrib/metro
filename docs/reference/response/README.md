@@ -1,5 +1,5 @@
 ---
-title: 'metro.response'
+title: 'Response'
 ---
 # metro.response
 

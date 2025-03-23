@@ -1,5 +1,5 @@
 ---
-title: 'metro.symbols'
+title: 'Symbols'
 ---
 # metro.symbols
 

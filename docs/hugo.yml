@@ -45,9 +45,22 @@ module:
     # Use the introduction.md file as the homepage
     - source: 'introduction.md'
       target: 'content/_index.md'
-    # Add middleware.md as "section"
-    - source: 'middleware.md'
+    # Add pages to create sections in the sidebar
+    # This also makes it possible to define menu order using "weight"
+    - source: 'details/README.md'
+      target: 'content/details/_index.md'
+    - source: 'middleware/README.md'
       target: 'content/middleware/_index.md'
+    - source: 'reference/README.md'
+      target: 'content/reference/_index.md'
+    - source: 'reference/client/README.md'
+      target: 'content/reference/client/_index.md'
+    - source: 'reference/request/README.md'
+      target: 'content/reference/request/_index.md'
+    - source: 'reference/response/README.md'
+      target: 'content/reference/response/_index.md'
+    - source: 'reference/trace/README.md'
+      target: 'content/reference/trace/_index.md'
 # ==============================================================================
 
 # ==============================================================================
