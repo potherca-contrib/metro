@@ -126,7 +126,8 @@ And make sure `npm test` doesn't fail.
 
 ### Improving The Documentation
 
-The docs/ folder contains the source for the https://metro.muze.nl/ website. It is auto-generated as a github pages site, using [hugo](https://gohugo.io/). See the `hugo.yml` file in the docs/ folder, and the `custom.css` in the docs/\_/ folder.
+The docs/ folder contains the source for the https://metro.muze.nl/ website. It is auto-generated as a GitHub pages site, using [hugo](https://gohugo.io/).
+The Hugo build is run with a reusable workflow, see the `.github/workflows/github-pages.yaml` file and https://github.com/Potherca/hugo-build for details. 
 
 <!-- omit in toc -->
 ## Attribution

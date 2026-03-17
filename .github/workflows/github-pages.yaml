@@ -26,19 +26,45 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-        id: pages
-      - name: Build with Hugo
-        uses: docker://hugomods/hugo:std-go-git
-        with:
-          args: >-
-            sh -c "cd docs; hugo mod init 'github.com/muze-nl/metro' && hugo mod get -u && hugo --gc --minify --baseURL 'https://metro.muze.nl/'"
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/public
+    uses: potherca/hugo-build/.github/workflows/hugo-build.yaml@main
+    with:
+      # See more build details
+      build-log-level: info
+      # Use README.md files as folder index
+      build-readme-as-index: true
+      # Import Hugo module of the "Relearn" theme
+      config-module-imports: |
+        { "path": "github.com/McShelby/hugo-theme-relearn" }
+      # Module mount configuration, For a full list of options see: https://gohugo.io/configuration/module/#mounts
+      config-module-mounts: |
+        { "source": "img/", "target": "content/reference/img/" },
+        { "source": "introduction.md", "target": "content/_index.md" }
+      # Theme specific configuration. For a full list of options see:
+      # https://mcshelby.github.io/hugo-theme-relearn/configuration/reference/
+      config-params: |
+        "alwaysopen": false,
+        "collapsibleMenu": true,
+        "disableGeneratorVersion": true,
+        "disableInlineCopyToClipBoard": true,
+        "disableLandingPageButton": true,
+        "themeVariant": [ "auto", "zen-dark", "zen-light" ]
+      # Custom CSS
+      css: |
+        /* Avoid title being shown twice */
+        h1:has(+ h1),
+        /* Hide the "Built with Hugo" link */
+        p:has(a[href="https://gohugo.io/"]),
+        /* Hide duplicate menu items */
+        [data-nav-id*="/readme/index.html"] {
+          display: none;
+        }
+      # Configuration in the root of the Hugo config. For a full list of options see: https://gohugo.io/configuration/all/
+      config-root-keys: |
+        "disableHugoGeneratorInject": true,
+        "languageCode": "en-us",
+        "markup": { "goldmark": { "renderer": { "unsafe": true } } },
+        "title": "MetroJS"
+      path: ./docs
 
   deploy:
     environment:
